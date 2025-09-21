@@ -82,10 +82,14 @@ class ButtomSheetItemForm extends StatelessWidget {
                   );
                 },
               ),
+              Gap(20),
               ElevatedButton(
                 onPressed: () {
                   priorListController.addItem();
                 },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50),
+                ),
                 child: Text('Submit'),
               ),
               Gap(80),

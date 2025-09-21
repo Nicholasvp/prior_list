@@ -75,4 +75,19 @@ class PriorListController extends StateController {
       error();
     }
   }
+
+  Future<void> deleteItem(String id) async {
+    loading();
+    try {
+      List<ItemModel> currentList = await getList();
+      currentList.removeWhere((item) => item.id == id);
+      String jsonString = json.encode(
+        currentList.map((item) => item.toJson()).toList(),
+      );
+      await hiveRepository.create('prior_list', jsonString);
+      getList();
+    } catch (e) {
+      error();
+    }
+  }
 }

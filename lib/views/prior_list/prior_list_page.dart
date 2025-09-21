@@ -26,7 +26,20 @@ class PriorListPage extends StatelessWidget {
               return ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {
-                  return ListTile(title: Text(items[index].title));
+                  return ListTile(
+                    title: Text(items[index].title),
+                    subtitle: Text(
+                      items[index].priorDate != null
+                          ? 'Due: ${items[index].priorDate}'
+                          : 'No due date',
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        priorListController.deleteItem(items[index].id);
+                      },
+                    ),
+                  );
                 },
               );
             }
