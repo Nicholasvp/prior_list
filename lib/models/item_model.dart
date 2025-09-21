@@ -7,18 +7,24 @@ class ItemModel {
   final String id;
   final String title;
   final DateTime createdAt;
-  final DateTime priorDate;
+  final DateTime? priorDate;
   final PriorType priorType;
 
   ItemModel({
     required this.id,
     required this.title,
     required this.createdAt,
-    required this.priorDate,
+    this.priorDate,
     required this.priorType,
   });
 
-  ItemModel copyWith({String? id, String? title, DateTime? createdAt, DateTime? priorDate, PriorType? priorType}) {
+  ItemModel copyWith({
+    String? id,
+    String? title,
+    DateTime? createdAt,
+    DateTime? priorDate,
+    PriorType? priorType,
+  }) {
     return ItemModel(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -33,7 +39,7 @@ class ItemModel {
       'id': id,
       'title': title,
       'createdAt': createdAt.millisecondsSinceEpoch,
-      'priorDate': priorDate.millisecondsSinceEpoch,
+      'priorDate': priorDate?.millisecondsSinceEpoch,
       'priorType': priorType.name,
     };
   }
@@ -43,14 +49,19 @@ class ItemModel {
       id: map['id'] as String,
       title: map['title'] as String,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
-      priorDate: DateTime.fromMillisecondsSinceEpoch(map['priorDate'] as int),
-      priorType: map['priorType'] != null ? transformToPriotType[map['priorType']]! : PriorType.low,
+      priorDate: map['priorDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['priorDate'] as int)
+          : null,
+      priorType: map['priorType'] != null
+          ? transformToPriotType[map['priorType']]!
+          : PriorType.low,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory ItemModel.fromJson(String source) => ItemModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory ItemModel.fromJson(String source) =>
+      ItemModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -70,6 +81,10 @@ class ItemModel {
 
   @override
   int get hashCode {
-    return id.hashCode ^ title.hashCode ^ createdAt.hashCode ^ priorDate.hashCode ^ priorType.hashCode;
+    return id.hashCode ^
+        title.hashCode ^
+        createdAt.hashCode ^
+        priorDate.hashCode ^
+        priorType.hashCode;
   }
 }

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:prior_list/controllers/home_controller.dart';
-import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/views/prior_list/prior_list_page.dart';
-import 'package:prior_list/widgets/text_form_primary.dart';
+import 'package:prior_list/widgets/buttom_sheet_item_form.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -33,37 +31,8 @@ class HomePage extends StatelessWidget {
       ),
       bottomSheet: ValueListenableBuilder(
         valueListenable: homeController.isAdding,
-        builder: (context, isAdding, child) => isAdding
-            ? BottomSheet(
-                onClosing: () {},
-                builder: (context) {
-                  return Container(
-                    constraints: BoxConstraints(maxHeight: 500, minHeight: 300),
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Add New Item',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        Gap(20),
-                        TextFormPrimary(
-                          label: 'Name',
-                          hintText: 'Enter the name',
-                        ),
-                        Gap(10),
-                        TextFormPrimary(
-                          label: 'Date',
-                          hintText: 'Enter the date',
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              )
-            : SizedBox.shrink(),
+        builder: (context, isAdding, child) =>
+            isAdding ? ButtomSheetItemForm() : SizedBox.shrink(),
       ),
     );
   }

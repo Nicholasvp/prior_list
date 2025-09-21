@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
+import 'package:prior_list/models/item_model.dart';
 
 class PriorListPage extends StatelessWidget {
   const PriorListPage({super.key});
@@ -21,11 +22,11 @@ class PriorListPage extends StatelessWidget {
             } else if (priorListController.isEmptyNotifier.value) {
               return const Center(child: Text('No items found'));
             } else {
-              List items = snapshot.data as List;
+              List<ItemModel> items = snapshot.data as List<ItemModel>;
               return ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {
-                  return ListTile(title: Text(items[index].toString()));
+                  return ListTile(title: Text(items[index].title));
                 },
               );
             }
