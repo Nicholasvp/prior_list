@@ -8,6 +8,7 @@ class ItemModel {
   final String title;
   final DateTime createdAt;
   final DateTime? priorDate;
+  final String? linkUrl;
   final PriorType priorType;
 
   ItemModel({
@@ -15,6 +16,7 @@ class ItemModel {
     required this.title,
     required this.createdAt,
     this.priorDate,
+    this.linkUrl,
     required this.priorType,
   });
 
@@ -23,6 +25,7 @@ class ItemModel {
     String? title,
     DateTime? createdAt,
     DateTime? priorDate,
+    String? linkUrl,
     PriorType? priorType,
   }) {
     return ItemModel(
@@ -31,6 +34,7 @@ class ItemModel {
       createdAt: createdAt ?? this.createdAt,
       priorDate: priorDate ?? this.priorDate,
       priorType: priorType ?? this.priorType,
+      linkUrl: linkUrl ?? this.linkUrl,
     );
   }
 
@@ -40,6 +44,7 @@ class ItemModel {
       'title': title,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'priorDate': priorDate?.millisecondsSinceEpoch,
+      'linkUrl': linkUrl,
       'priorType': priorType.name,
     };
   }
@@ -52,6 +57,7 @@ class ItemModel {
       priorDate: map['priorDate'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['priorDate'] as int)
           : null,
+      linkUrl: map['linkUrl'] as String? ?? '',
       priorType: map['priorType'] != null
           ? transformToPriotType[map['priorType']]!
           : PriorType.low,
@@ -65,7 +71,7 @@ class ItemModel {
 
   @override
   String toString() {
-    return 'ItemModel(id: $id, title: $title, createdAt: $createdAt, priorDate: $priorDate, priorType: $priorType)';
+    return 'ItemModel(id: $id, title: $title, createdAt: $createdAt, priorDate: $priorDate, linkUrl: $linkUrl, priorType: $priorType)';
   }
 
   @override
@@ -76,6 +82,7 @@ class ItemModel {
         other.title == title &&
         other.createdAt == createdAt &&
         other.priorDate == priorDate &&
+        other.linkUrl == linkUrl &&
         other.priorType == priorType;
   }
 
@@ -85,6 +92,7 @@ class ItemModel {
         title.hashCode ^
         createdAt.hashCode ^
         priorDate.hashCode ^
+        linkUrl.hashCode ^
         priorType.hashCode;
   }
 }

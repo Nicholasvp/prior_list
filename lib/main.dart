@@ -16,8 +16,8 @@ Future<void> main() async {
   final dir = await getApplicationDocumentsDirectory();
   Hive.init(dir.path);
 
-  autoInjector.add(PriorListController.new);
-  autoInjector.add(HomeController.new);
+  autoInjector.addSingleton(PriorListController.new);
+  autoInjector.addSingleton(HomeController.new);
   autoInjector.commit();
 
   runApp(const MyApp());

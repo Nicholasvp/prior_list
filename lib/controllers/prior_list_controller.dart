@@ -10,17 +10,20 @@ import 'package:prior_list/repositories/hive_repository.dart';
 class PriorListController extends StateController {
   HiveRepository hiveRepository = HiveRepository('prior_list');
 
+  final items = ValueNotifier<List<ItemModel>>([]);
+
   final nomeController = TextEditingController();
   final dateController = TextEditingController();
+  final linkUrlController = TextEditingController();
   final priorityForm = ValueNotifier<String>('LOW');
 
-  Future<List<ItemModel>> getList() async {
+  Future<void> getList() async {
     loading();
     try {
       final data = await hiveRepository.read('prior_list');
       if (data == null) {
         empty();
-        return [];
+        items.value = [];
       }
       List<ItemModel> itemList = [];
       if (data is String) {
@@ -42,13 +45,13 @@ class PriorListController extends StateController {
       }
       if (itemList.isEmpty) {
         empty();
-        return [];
+        items.value = [];
       }
       completed();
-      return itemList;
+      items.value = itemList;
     } catch (e) {
       error();
-      return [];
+      items.value = [];
     }
   }
 
@@ -61,15 +64,20 @@ class PriorListController extends StateController {
       priorDate: dateController.text.isNotEmpty
           ? DateFormat('dd/MM/yyyy').parse(dateController.text)
           : null,
-      priorType: transformToPriotType[priorityForm.value]!,
+      linkUrl: linkUrlController.text,
+      priorType: transformToPriotType[priorityForm.value] ?? PriorType.low,
     );
     try {
-      List<ItemModel> currentList = await getList();
+      List<ItemModel> currentList = items.value;
       currentList.add(item);
       String jsonString = json.encode(
         currentList.map((item) => item.toJson()).toList(),
       );
       await hiveRepository.create('prior_list', jsonString);
+
+      nomeController.clear();
+      dateController.clear();
+      priorityForm.value = 'LOW';
       getList();
     } catch (e) {
       error();
@@ -79,7 +87,7 @@ class PriorListController extends StateController {
   Future<void> deleteItem(String id) async {
     loading();
     try {
-      List<ItemModel> currentList = await getList();
+      List<ItemModel> currentList = items.value;
       currentList.removeWhere((item) => item.id == id);
       String jsonString = json.encode(
         currentList.map((item) => item.toJson()).toList(),
