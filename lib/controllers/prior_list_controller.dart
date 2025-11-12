@@ -12,10 +12,14 @@ class PriorListController extends StateController {
 
   final items = ValueNotifier<List<ItemModel>>([]);
 
+  // keep a master copy of the full list so searches can filter and
+  // be reset to the full list when the query is empty
+  List<ItemModel> _allItems = [];
+
   final nomeController = TextEditingController();
   final dateController = TextEditingController();
   final linkUrlController = TextEditingController();
-  final priorityForm = ValueNotifier<String>('LOW');
+  final priorityForm = ValueNotifier<String>('low');
 
   Future<void> getList() async {
     loading();
@@ -45,13 +49,43 @@ class PriorListController extends StateController {
       }
       if (itemList.isEmpty) {
         empty();
+        _allItems = [];
         items.value = [];
+      } else {
+        // store full list for search resets
+        _allItems = List<ItemModel>.from(itemList);
+        completed();
+        items.value = itemList;
       }
-      completed();
-      items.value = itemList;
     } catch (e) {
       error();
       items.value = [];
+    }
+  }
+
+  /// Search items by [query]. When [query] is empty or whitespace only,
+  /// restore the full list. This method toggles loading state while
+  /// performing the filter so UI can show a loader if desired.
+  Future<void> search(String query) async {
+    loading();
+    try {
+      final q = query.trim();
+      if (q.isEmpty) {
+        // return the full list
+        items.value = List<ItemModel>.from(_allItems);
+        completed();
+        return;
+      }
+
+      final filtered = _allItems.where((item) {
+        final title = item.title;
+        return title.toLowerCase().contains(q.toLowerCase());
+      }).toList();
+
+      items.value = filtered;
+      completed();
+    } catch (e) {
+      error();
     }
   }
 
@@ -77,7 +111,58 @@ class PriorListController extends StateController {
 
       nomeController.clear();
       dateController.clear();
-      priorityForm.value = 'LOW';
+      priorityForm.value = 'low';
+      getList();
+    } catch (e) {
+      error();
+    }
+  }
+
+  /// Preenche os controllers com os dados do item para edição
+  void populateForEdit(ItemModel item) {
+    nomeController.text = item.title;
+    dateController.text = item.priorDate != null
+        ? DateFormat('dd/MM/yyyy').format(item.priorDate!)
+        : '';
+    linkUrlController.text = item.linkUrl ?? '';
+    priorityForm.value = item.priorType.name.toLowerCase();
+  }
+
+  /// Edita um item existente identificado por [id] usando os valores
+  /// atuais dos controllers e persiste no repositório.
+  Future<void> editItem(String id) async {
+    loading();
+    try {
+      List<ItemModel> currentList = items.value;
+      final idx = currentList.indexWhere((element) => element.id == id);
+      if (idx == -1) {
+        // item não encontrado
+        error();
+        return;
+      }
+
+      final updated = currentList[idx].copyWith(
+        title: nomeController.text,
+        priorDate: dateController.text.isNotEmpty
+            ? DateFormat('dd/MM/yyyy').parse(dateController.text)
+            : null,
+        linkUrl: linkUrlController.text,
+        priorType: transformToPriotType[priorityForm.value] ?? PriorType.low,
+      );
+
+      currentList[idx] = updated;
+
+      String jsonString = json.encode(
+        currentList.map((item) => item.toJson()).toList(),
+      );
+      await hiveRepository.create('prior_list', jsonString);
+
+      // limpa campos
+      nomeController.clear();
+      dateController.clear();
+      linkUrlController.clear();
+      priorityForm.value = 'low';
+
       getList();
     } catch (e) {
       error();
