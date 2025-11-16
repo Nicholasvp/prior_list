@@ -63,15 +63,26 @@ class PriorListController extends StateController {
     }
   }
 
-  /// Search items by [query]. When [query] is empty or whitespace only,
-  /// restore the full list. This method toggles loading state while
-  /// performing the filter so UI can show a loader if desired.
+  void sortItems(String criteria) {
+    loading();
+    List<ItemModel> sortedItems = List<ItemModel>.from(items.value);
+    if (criteria == 'date') {
+      sortedItems.sort((a, b) => (a.priorDate ?? DateTime(0))
+          .compareTo(b.priorDate ?? DateTime(0)));
+    } else if (criteria == 'alphabetical') {
+      sortedItems.sort((a, b) => a.title.compareTo(b.title));
+    } else if (criteria == 'priority') {
+      sortedItems.sort((a, b) => a.priorType.index.compareTo(b.priorType.index));
+    }
+    items.value = sortedItems;
+    completed();
+  }
+
   Future<void> search(String query) async {
     loading();
     try {
       final q = query.trim();
       if (q.isEmpty) {
-        // return the full list
         items.value = List<ItemModel>.from(_allItems);
         completed();
         return;
@@ -87,6 +98,11 @@ class PriorListController extends StateController {
     } catch (e) {
       error();
     }
+  }
+  void clearForm() {
+    nomeController.clear();
+    dateController.clear();
+    linkUrlController.clear();
   }
 
   Future<void> addItem() async {
@@ -109,8 +125,6 @@ class PriorListController extends StateController {
       );
       await hiveRepository.create('prior_list', jsonString);
 
-      nomeController.clear();
-      dateController.clear();
       priorityForm.value = 'low';
       getList();
     } catch (e) {
@@ -118,7 +132,6 @@ class PriorListController extends StateController {
     }
   }
 
-  /// Preenche os controllers com os dados do item para edição
   void populateForEdit(ItemModel item) {
     nomeController.text = item.title;
     dateController.text = item.priorDate != null
@@ -128,15 +141,13 @@ class PriorListController extends StateController {
     priorityForm.value = item.priorType.name.toLowerCase();
   }
 
-  /// Edita um item existente identificado por [id] usando os valores
-  /// atuais dos controllers e persiste no repositório.
   Future<void> editItem(String id) async {
     loading();
     try {
       List<ItemModel> currentList = items.value;
       final idx = currentList.indexWhere((element) => element.id == id);
       if (idx == -1) {
-        // item não encontrado
+        
         error();
         return;
       }
@@ -169,7 +180,27 @@ class PriorListController extends StateController {
     }
   }
 
-  Future<void> deleteItem(String id) async {
+  Future<void> deleteItem(String id, BuildContext context) async {
+    bool confim = false;
+    confim = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Confirm Deletion'),
+            content: const Text('Are you sure you want to delete this item?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Delete'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
     loading();
     try {
       List<ItemModel> currentList = items.value;

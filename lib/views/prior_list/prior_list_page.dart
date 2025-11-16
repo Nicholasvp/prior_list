@@ -17,6 +17,58 @@ class PriorListPage extends StatefulWidget {
 class _PriorListPageState extends State<PriorListPage> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
+  final priorListController = autoInjector.get<PriorListController>();
+
+  void _openSortModal() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: HugeIcon(
+                    icon: HugeIcons.strokeRoundedCalendar01,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+                    priorListController.sortItems('date');
+                    Navigator.pop(context);
+                  },
+                ),
+                IconButton(
+                  icon: HugeIcon(
+                    icon: HugeIcons.strokeRoundedAlpha,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+                    priorListController.sortItems('alphabetical');
+                    Navigator.pop(context);
+                  },
+                ),
+                IconButton(
+                  icon: HugeIcon(
+                    icon: HugeIcons.strokeRoundedHighHeels01,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+                    priorListController.sortItems('priority');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -26,7 +78,7 @@ class _PriorListPageState extends State<PriorListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final priorListController = autoInjector.get<PriorListController>();
+    
     if (priorListController.items.value.isEmpty &&
         !priorListController.isLoadingNotifier.value) {
       priorListController.getList();
@@ -38,32 +90,44 @@ class _PriorListPageState extends State<PriorListPage> {
           if (widget.showSearch)
             Padding(
               padding: const EdgeInsets.all(18),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Pesquisar...',
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: FittedBox(
-                        fit: BoxFit.contain,
-                        child: const HugeIcon(
-                          icon: HugeIcons.strokeRoundedSearchCircle,
-                          color: Colors.black,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Pesquisar...',
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: const HugeIcon(
+                                icon: HugeIcons.strokeRoundedSearchCircle,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
+                      onChanged: (val) {
+                        setState(() => _query = val);
+                        priorListController.search(_query);
+                      },
                     ),
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                  IconButton(
+                    icon: const HugeIcon(icon: HugeIcons.strokeRoundedFilter, color: Colors.black,),
+                    onPressed: _openSortModal,
                   ),
-                ),
-                onChanged: (val) => setState(() => _query = val),
+                ],
               ),
             ),
-
           Expanded(
             child: ValueListenableBuilder(
               valueListenable: priorListController.state,
@@ -76,19 +140,11 @@ class _PriorListPageState extends State<PriorListPage> {
                   return const Center(child: Text('No items found'));
                 } else {
                   List<ItemModel> items = priorListController.items.value;
-                  if (_query.isNotEmpty) {
-                    final q = _query.toLowerCase();
-                    items = items.where((i) {
-                      final title = i.title.toLowerCase();
-                      final link = (i.linkUrl ?? '').toLowerCase();
-                      return title.contains(q) || link.contains(q);
-                    }).toList();
                     if (items.isEmpty) {
                       return const Center(
                         child: Text('No items match your search'),
                       );
                     }
-                  }
                   return PriorListBuilder(items: items);
                 }
               },

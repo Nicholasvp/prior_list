@@ -28,7 +28,7 @@ class _EditItemPageState extends State<EditItemPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar item')),
+      appBar: AppBar(title: const Text('Edit item')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -36,13 +36,13 @@ class _EditItemPageState extends State<EditItemPage> {
           children: [
             TextField(
               controller: controller.nomeController,
-              decoration: const InputDecoration(labelText: 'Título'),
+              decoration: const InputDecoration(labelText: 'Title'),
             ),
             const SizedBox(height: 12),
             TextField(
               readOnly: true,
               controller: controller.dateController,
-              decoration: const InputDecoration(labelText: 'Data (dd/MM/yyyy)'),
+              decoration: const InputDecoration(labelText: 'Date (dd/MM/yyyy)'),
               onTap: () async {
                 DateTime initialDate = DateTime.now();
                 if (controller.dateController.text.isNotEmpty) {
@@ -103,14 +103,14 @@ class _EditItemPageState extends State<EditItemPage> {
                 await controller.editItem(widget.item.id);
                 Navigator.of(context).pop();
               },
-              child: const Text('Salvar'),
+              child: const Text('Submit'),
             ),
             const SizedBox(height: 12),
             OutlinedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Voltar'),
+              child: const Text('Cancel'),
             ),
           ],
         ),
