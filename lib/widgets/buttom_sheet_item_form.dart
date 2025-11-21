@@ -5,6 +5,7 @@ import 'package:prior_list/controllers/home_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/enums/enums.dart';
 import 'package:prior_list/main.dart';
+import 'package:prior_list/repositories/notification_repository.dart';
 import 'package:prior_list/widgets/text_form_primary.dart';
 
 class ButtomSheetItemForm extends StatelessWidget {
@@ -106,6 +107,10 @@ class ButtomSheetItemForm extends StatelessWidget {
                     onPressed: () {
                       if (formKey.currentState?.validate() ?? false) {
                         priorListController.addItem();
+                        NotificationRepository().showNotification(
+                          title: "Item added", 
+                          body: 'item: ${priorListController.nomeController.text}',
+                          );
                         homeController.isAdding.value = false;
                       }
                     },
