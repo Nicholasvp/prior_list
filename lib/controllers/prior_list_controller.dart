@@ -6,6 +6,7 @@ import 'package:prior_list/controllers/state_controller.dart';
 import 'package:prior_list/enums/enums.dart';
 import 'package:prior_list/models/item_model.dart';
 import 'package:prior_list/repositories/hive_repository.dart';
+import 'package:prior_list/repositories/notification_repository.dart';
 
 class PriorListController extends StateController {
   HiveRepository hiveRepository = HiveRepository('prior_list');
@@ -67,12 +68,16 @@ class PriorListController extends StateController {
     loading();
     List<ItemModel> sortedItems = List<ItemModel>.from(items.value);
     if (criteria == 'date') {
-      sortedItems.sort((a, b) => (a.priorDate ?? DateTime(0))
-          .compareTo(b.priorDate ?? DateTime(0)));
+      sortedItems.sort(
+        (a, b) =>
+            (a.priorDate ?? DateTime(0)).compareTo(b.priorDate ?? DateTime(0)),
+      );
     } else if (criteria == 'alphabetical') {
       sortedItems.sort((a, b) => a.title.compareTo(b.title));
     } else if (criteria == 'priority') {
-      sortedItems.sort((a, b) => a.priorType.index.compareTo(b.priorType.index));
+      sortedItems.sort(
+        (a, b) => a.priorType.index.compareTo(b.priorType.index),
+      );
     }
     items.value = sortedItems;
     completed();
@@ -99,6 +104,7 @@ class PriorListController extends StateController {
       error();
     }
   }
+
   void clearForm() {
     nomeController.clear();
     dateController.clear();
@@ -107,12 +113,13 @@ class PriorListController extends StateController {
 
   Future<void> addItem() async {
     loading();
+    final now = DateTime.now();
     final item = ItemModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: now.millisecondsSinceEpoch.toString(),
       title: nomeController.text,
-      createdAt: DateTime.now(),
+      createdAt: now,
       priorDate: dateController.text.isNotEmpty
-          ? DateFormat('dd/MM/yyyy').parse(dateController.text)
+          ? DateFormat('dd/MM/yyyy HH:mm').parse(dateController.text)
           : null,
       linkUrl: linkUrlController.text,
       priorType: transformToPriotType[priorityForm.value] ?? PriorType.low,
@@ -124,8 +131,18 @@ class PriorListController extends StateController {
         currentList.map((item) => item.toJson()).toList(),
       );
       await hiveRepository.create('prior_list', jsonString);
-
       priorityForm.value = 'low';
+      if (item.priorDate != null) {
+        NotificationRepository().scheduleNotification(
+          title: 'Reminder',
+          body: item.title,
+          year: item.priorDate!.year,
+          month: item.priorDate!.month,
+          day: item.priorDate!.day,
+          hour: item.priorDate!.hour,
+          minute: item.priorDate!.minute,
+        );
+      }
       getList();
     } catch (e) {
       error();
@@ -147,7 +164,6 @@ class PriorListController extends StateController {
       List<ItemModel> currentList = items.value;
       final idx = currentList.indexWhere((element) => element.id == id);
       if (idx == -1) {
-        
         error();
         return;
       }
@@ -182,7 +198,8 @@ class PriorListController extends StateController {
 
   Future<void> deleteItem(String id, BuildContext context) async {
     bool confim = false;
-    confim = await showDialog<bool>(
+    confim =
+        await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Confirm Deletion'),
@@ -201,17 +218,19 @@ class PriorListController extends StateController {
         ) ??
         false;
 
-    loading();
-    try {
-      List<ItemModel> currentList = items.value;
-      currentList.removeWhere((item) => item.id == id);
-      String jsonString = json.encode(
-        currentList.map((item) => item.toJson()).toList(),
-      );
-      await hiveRepository.create('prior_list', jsonString);
-      getList();
-    } catch (e) {
-      error();
+    if (confim) {
+      loading();
+      try {
+        List<ItemModel> currentList = items.value;
+        currentList.removeWhere((item) => item.id == id);
+        String jsonString = json.encode(
+          currentList.map((item) => item.toJson()).toList(),
+        );
+        await hiveRepository.create('prior_list', jsonString);
+        getList();
+      } catch (e) {
+        error();
+      }
     }
   }
 }

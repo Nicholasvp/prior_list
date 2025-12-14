@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 
 class NotificationRepository {
@@ -11,6 +12,10 @@ class NotificationRepository {
   // INITIALIZE
   Future<void> initialize() async {
     if (_isInitialized) return;
+
+    tz.initializeTimeZones();
+    final currentTimeZone = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
 
     const initSettingsAndroid = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
@@ -56,16 +61,19 @@ class NotificationRepository {
     int id = 1,
     required String title,
     required String body,
+    required int year,
+    required int month,
+    required int day,
     required int hour,
     required int minute,
   }) async {
-    final now = tz.TZDateTime.now(tz.local);
+    // final now = tz.TZDateTime.now(tz.local);
 
     var scheduledDate = tz.TZDateTime(
       tz.local,
-      now.year,
-      now.month,
-      now.day,
+      year,
+      month,
+      day,
       hour,
       minute,
     );
@@ -77,7 +85,7 @@ class NotificationRepository {
       scheduledDate,
       NotificationDetails(),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
+      // matchDateTimeComponents: DateTimeComponents.time,
     );
   }
 

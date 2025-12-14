@@ -59,16 +59,39 @@ class ButtomSheetItemForm extends StatelessWidget {
                     ),
                     controller: priorListController.dateController,
                     onTap: () async {
+                      final now = DateTime.now();
                       DateTime? pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
+                        initialDate: now,
+                        firstDate: now,
                         lastDate: DateTime(2100),
                       );
                       if (pickedDate != null) {
-                        priorListController.dateController.text = DateFormat(
-                          'dd/MM/yyyy',
-                        ).format(pickedDate);
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (pickedTime != null) {
+                          DateTime finalDateTime = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                          );
+                          
+                          if (finalDateTime.isBefore(now)) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please select a future time'),
+                              ),
+                            );
+                            return;
+                          }
+                          priorListController.dateController.text = DateFormat(
+                            'dd/MM/yyyy HH:mm',
+                          ).format(finalDateTime);
+                        }
                       }
                     },
                   ),
@@ -88,7 +111,9 @@ class ButtomSheetItemForm extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: PriorType.values.map((priorType) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4.0,
+                            ),
                             child: ChoiceChip(
                               label: Text(priorType.name.toUpperCase()),
                               selected: priority == priorType.name,
@@ -107,10 +132,7 @@ class ButtomSheetItemForm extends StatelessWidget {
                     onPressed: () {
                       if (formKey.currentState?.validate() ?? false) {
                         priorListController.addItem();
-                        NotificationRepository().showNotification(
-                          title: "Item added", 
-                          body: 'item: ${priorListController.nomeController.text}',
-                          );
+
                         homeController.isAdding.value = false;
                       }
                     },
