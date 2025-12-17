@@ -44,7 +44,7 @@ class _PriorListPageState extends State<PriorListPage> {
                 ),
                 IconButton(
                   icon: HugeIcon(
-                    icon: HugeIcons.strokeRoundedAlpha,
+                    icon: HugeIcons.strokeRoundedArrangeByLettersAZ,
                     color: Colors.black,
                   ),
                   onPressed: () {
@@ -54,7 +54,7 @@ class _PriorListPageState extends State<PriorListPage> {
                 ),
                 IconButton(
                   icon: HugeIcon(
-                    icon: HugeIcons.strokeRoundedHighHeels01,
+                    icon: HugeIcons.strokeRoundedTemperature,
                     color: Colors.black,
                   ),
                   onPressed: () {
