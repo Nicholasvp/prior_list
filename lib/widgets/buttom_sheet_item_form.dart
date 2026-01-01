@@ -5,7 +5,7 @@ import 'package:prior_list/controllers/home_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/enums/enums.dart';
 import 'package:prior_list/main.dart';
-import 'package:prior_list/repositories/notification_repository.dart';
+import 'package:prior_list/widgets/color_picker_widget.dart';
 import 'package:prior_list/widgets/text_form_primary.dart';
 
 class ButtomSheetItemForm extends StatelessWidget {
@@ -79,7 +79,7 @@ class ButtomSheetItemForm extends StatelessWidget {
                             pickedTime.hour,
                             pickedTime.minute,
                           );
-                          
+
                           if (finalDateTime.isBefore(now)) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -128,11 +128,12 @@ class ButtomSheetItemForm extends StatelessWidget {
                     },
                   ),
                   Gap(20),
+                  ColorPickerWidget(controller: priorListController),
+                  Gap(20),
                   ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState?.validate() ?? false) {
                         priorListController.addItem();
-
                         homeController.isAdding.value = false;
                       }
                     },

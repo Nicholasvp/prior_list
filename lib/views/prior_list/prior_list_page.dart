@@ -96,7 +96,7 @@ class _PriorListPageState extends State<PriorListPage> {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText: 'Pesquisar...',
+                        hintText: 'Search...',
                         prefixIcon: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: SizedBox(

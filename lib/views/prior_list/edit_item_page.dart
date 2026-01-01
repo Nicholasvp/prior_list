@@ -4,6 +4,7 @@ import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/models/item_model.dart';
 import 'package:prior_list/enums/enums.dart';
+import 'package:prior_list/widgets/color_picker_widget.dart';
 
 class EditItemPage extends StatefulWidget {
   final ItemModel item;
@@ -76,7 +77,7 @@ class _EditItemPageState extends State<EditItemPage> {
               builder: (context, value, _) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Prioridade'),
+                  const Text('Priority'),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -95,6 +96,10 @@ class _EditItemPageState extends State<EditItemPage> {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 12),
+            ColorPickerWidget(
+              controller: controller,
             ),
             const SizedBox(height: 24),
             ElevatedButton(

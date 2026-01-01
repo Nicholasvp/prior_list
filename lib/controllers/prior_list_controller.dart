@@ -21,6 +21,7 @@ class PriorListController extends StateController {
   final dateController = TextEditingController();
   final linkUrlController = TextEditingController();
   final priorityForm = ValueNotifier<String>('low');
+  final selectedColor = ValueNotifier<String?>(null);
 
   Future<void> getList() async {
     loading();
@@ -123,6 +124,7 @@ class PriorListController extends StateController {
           : null,
       linkUrl: linkUrlController.text,
       priorType: transformToPriotType[priorityForm.value] ?? PriorType.low,
+      color: selectedColor.value,
     );
     try {
       List<ItemModel> currentList = items.value;
@@ -132,6 +134,7 @@ class PriorListController extends StateController {
       );
       await hiveRepository.create('prior_list', jsonString);
       priorityForm.value = 'low';
+      selectedColor.value = null;
       if (item.priorDate != null) {
         NotificationRepository().scheduleNotification(
           title: 'Reminder',
@@ -156,6 +159,7 @@ class PriorListController extends StateController {
         : '';
     linkUrlController.text = item.linkUrl ?? '';
     priorityForm.value = item.priorType.name.toLowerCase();
+    selectedColor.value = item.color;
   }
 
   Future<void> editItem(String id) async {
@@ -175,6 +179,7 @@ class PriorListController extends StateController {
             : null,
         linkUrl: linkUrlController.text,
         priorType: transformToPriotType[priorityForm.value] ?? PriorType.low,
+        color: selectedColor.value,
       );
 
       currentList[idx] = updated;
@@ -189,6 +194,7 @@ class PriorListController extends StateController {
       dateController.clear();
       linkUrlController.clear();
       priorityForm.value = 'low';
+      selectedColor.value = null;
 
       getList();
     } catch (e) {

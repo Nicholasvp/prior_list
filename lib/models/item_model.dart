@@ -10,6 +10,7 @@ class ItemModel {
   final DateTime? priorDate;
   final String? linkUrl;
   final PriorType priorType;
+  final String? color;
 
   ItemModel({
     required this.id,
@@ -18,6 +19,7 @@ class ItemModel {
     this.priorDate,
     this.linkUrl,
     required this.priorType,
+    this.color,
   });
 
   ItemModel copyWith({
@@ -27,6 +29,7 @@ class ItemModel {
     DateTime? priorDate,
     String? linkUrl,
     PriorType? priorType,
+    String? color,
   }) {
     return ItemModel(
       id: id ?? this.id,
@@ -35,6 +38,7 @@ class ItemModel {
       priorDate: priorDate ?? this.priorDate,
       priorType: priorType ?? this.priorType,
       linkUrl: linkUrl ?? this.linkUrl,
+      color: color ?? this.color,
     );
   }
 
@@ -46,6 +50,7 @@ class ItemModel {
       'priorDate': priorDate?.millisecondsSinceEpoch,
       'linkUrl': linkUrl,
       'priorType': priorType.name,
+      'color': color,
     };
   }
 
@@ -61,6 +66,7 @@ class ItemModel {
       priorType: map['priorType'] != null
           ? transformToPriotType[map['priorType']]!
           : PriorType.low,
+      color: map['color'] as String?,
     );
   }
 
@@ -71,7 +77,7 @@ class ItemModel {
 
   @override
   String toString() {
-    return 'ItemModel(id: $id, title: $title, createdAt: $createdAt, priorDate: $priorDate, linkUrl: $linkUrl, priorType: $priorType)';
+    return 'ItemModel(id: $id, title: $title, createdAt: $createdAt, priorDate: $priorDate, linkUrl: $linkUrl, priorType: $priorType, color: $color)';
   }
 
   @override
@@ -83,7 +89,8 @@ class ItemModel {
         other.createdAt == createdAt &&
         other.priorDate == priorDate &&
         other.linkUrl == linkUrl &&
-        other.priorType == priorType;
+        other.priorType == priorType &&
+        other.color == color;
   }
 
   @override
@@ -93,6 +100,7 @@ class ItemModel {
         createdAt.hashCode ^
         priorDate.hashCode ^
         linkUrl.hashCode ^
-        priorType.hashCode;
+        priorType.hashCode ^
+        color.hashCode;
   }
 }

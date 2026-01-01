@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:from_css_color/from_css_color.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
@@ -36,7 +37,7 @@ class PriorListBuilder extends StatelessWidget {
                 ),
               ],
               border: Border(
-                left: BorderSide(color: Colors.blue[100]!, width: 6),
+                left: BorderSide(color: fromCssColor(item.color?? '#fff'), width: 6),
               ),
             ),
             child: ListTile(
