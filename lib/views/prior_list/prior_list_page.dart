@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:prior_list/controllers/ad_mob_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/views/prior_list/prior_list_builder.dart';
@@ -18,6 +20,13 @@ class _PriorListPageState extends State<PriorListPage> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
   final priorListController = autoInjector.get<PriorListController>();
+  final adMobController = autoInjector.get<AdMobController>();
+
+  @override
+  void didChangeDependencies() {
+    adMobController.loadAd(context);
+    super.didChangeDependencies();
+  }
 
   void _openSortModal() {
     showDialog(
@@ -78,7 +87,6 @@ class _PriorListPageState extends State<PriorListPage> {
 
   @override
   Widget build(BuildContext context) {
-    
     if (priorListController.items.value.isEmpty &&
         !priorListController.isLoadingNotifier.value) {
       priorListController.getList();
@@ -87,6 +95,22 @@ class _PriorListPageState extends State<PriorListPage> {
     return SafeArea(
       child: Column(
         children: [
+          ValueListenableBuilder(
+            valueListenable: adMobController.bannerAd,
+            builder: (context, BannerAd? bannerAd, child) {
+              if (bannerAd != null) {
+                return Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SizedBox(
+                    width: bannerAd.size.width.toDouble(),
+                    height: bannerAd.size.height.toDouble(),
+                    child: AdWidget(ad: bannerAd),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
           if (widget.showSearch)
             Padding(
               padding: const EdgeInsets.all(18),
@@ -122,7 +146,10 @@ class _PriorListPageState extends State<PriorListPage> {
                     ),
                   ),
                   IconButton(
-                    icon: const HugeIcon(icon: HugeIcons.strokeRoundedFilter, color: Colors.black,),
+                    icon: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedFilter,
+                      color: Colors.black,
+                    ),
                     onPressed: _openSortModal,
                   ),
                 ],
@@ -140,11 +167,11 @@ class _PriorListPageState extends State<PriorListPage> {
                   return const Center(child: Text('No items found'));
                 } else {
                   List<ItemModel> items = priorListController.items.value;
-                    if (items.isEmpty) {
-                      return const Center(
-                        child: Text('No items match your search'),
-                      );
-                    }
+                  if (items.isEmpty) {
+                    return const Center(
+                      child: Text('No items match your search'),
+                    );
+                  }
                   return PriorListBuilder(items: items);
                 }
               },
