@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
+import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/home_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/enums/enums.dart';
@@ -14,6 +16,7 @@ class ButtomSheetItemForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final priorListController = autoInjector.get<PriorListController>();
+    final coinscontroller = autoInjector.get<CoinsController>();
     final homeController = autoInjector.get<HomeController>();
 
     final formKey = GlobalKey<FormState>();
@@ -27,7 +30,7 @@ class ButtomSheetItemForm extends StatelessWidget {
       builder: (context) {
         return SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.all(32),
+            padding: const EdgeInsets.all(32),
             child: Form(
               key: formKey,
               child: Column(
@@ -35,17 +38,17 @@ class ButtomSheetItemForm extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Add New Item',
+                    'form.title'.tr(),
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   Gap(20),
                   TextFormPrimary(
-                    label: 'Name',
-                    hintText: 'Enter the name',
+                    label: 'form.name.label'.tr(),
+                    hintText: 'form.name.hint'.tr(),
                     controller: priorListController.nomeController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter a name';
+                        return 'form.name.validation'.tr();
                       }
                       return null;
                     },
@@ -53,56 +56,70 @@ class ButtomSheetItemForm extends StatelessWidget {
                   Gap(10),
                   TextFormField(
                     readOnly: true,
-                    decoration: InputDecoration(
-                      labelText: 'Date',
-                      hintText: 'Select a date',
-                    ),
                     controller: priorListController.dateController,
+                    decoration: InputDecoration(
+                      labelText: 'form.date.label'.tr(),
+                      hintText: 'form.date.hint'.tr(),
+                      suffixIcon: const Icon(Icons.calendar_today),
+                    ),
                     onTap: () async {
                       final now = DateTime.now();
-                      DateTime? pickedDate = await showDatePicker(
+
+                      DateTime initialDateTime = now;
+                      if (priorListController.dateController.text.isNotEmpty) {
+                        try {
+                          initialDateTime = DateFormat(
+                            'dd/MM/yyyy HH:mm',
+                          ).parse(priorListController.dateController.text);
+                        } catch (_) {}
+                      }
+
+                      final pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: now,
+                        initialDate: initialDateTime,
                         firstDate: now,
                         lastDate: DateTime(2100),
                       );
-                      if (pickedDate != null) {
-                        TimeOfDay? pickedTime = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.now(),
-                        );
-                        if (pickedTime != null) {
-                          DateTime finalDateTime = DateTime(
-                            pickedDate.year,
-                            pickedDate.month,
-                            pickedDate.day,
-                            pickedTime.hour,
-                            pickedTime.minute,
-                          );
 
-                          if (finalDateTime.isBefore(now)) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please select a future time'),
-                              ),
-                            );
-                            return;
-                          }
-                          priorListController.dateController.text = DateFormat(
-                            'dd/MM/yyyy HH:mm',
-                          ).format(finalDateTime);
-                        }
+                      if (pickedDate == null) return;
+
+                      final pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.fromDateTime(initialDateTime),
+                      );
+
+                      if (pickedTime == null) return;
+
+                      final selectedDateTime = DateTime(
+                        pickedDate.year,
+                        pickedDate.month,
+                        pickedDate.day,
+                        pickedTime.hour,
+                        pickedTime.minute,
+                      );
+
+                      if (selectedDateTime.isBefore(now)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('form.date.validation_future'.tr()),
+                          ),
+                        );
+                        return;
                       }
+
+                      priorListController.dateController.text = DateFormat(
+                        'dd/MM/yyyy HH:mm',
+                      ).format(selectedDateTime);
                     },
                   ),
                   Gap(10),
                   TextFormPrimary(
-                    label: 'Link URL',
-                    hintText: 'Enter the link URL',
+                    label: 'form.link.label'.tr(),
+                    hintText: 'form.link.hint'.tr(),
                     controller: priorListController.linkUrlController,
                   ),
                   Gap(15),
-                  Text('Priority'),
+                  Text('form.priority.label'.tr()),
                   Gap(5),
                   ValueListenableBuilder(
                     valueListenable: priorListController.priorityForm,
@@ -115,7 +132,7 @@ class ButtomSheetItemForm extends StatelessWidget {
                               horizontal: 4.0,
                             ),
                             child: ChoiceChip(
-                              label: Text(priorType.name.toUpperCase()),
+                              label: Text('priority.${priorType.name}'.tr()),
                               selected: priority == priorType.name,
                               onSelected: (bool selected) {
                                 priorListController.priorityForm.value =
@@ -131,16 +148,31 @@ class ButtomSheetItemForm extends StatelessWidget {
                   ColorPickerWidget(controller: priorListController),
                   Gap(20),
                   ElevatedButton(
-                    onPressed: () {
-                      if (formKey.currentState?.validate() ?? false) {
-                        priorListController.addItem();
-                        homeController.isAdding.value = false;
-                      }
-                    },
+                    onPressed: coinscontroller.hasEnoughToAddItem
+                        ? () {
+                            if (formKey.currentState?.validate() ?? false) {
+                              priorListController.addItem();
+                              homeController.isAdding.value = false;
+                            }
+                          }
+                        : null,
                     style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50),
+                      minimumSize: const Size(double.infinity, 50),
                     ),
-                    child: Text('Submit'),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('create'.tr()),
+                        Gap(20),
+                        Text('button.cost'.tr()),
+                        Gap(5),
+                        SvgPicture.asset(
+                          'assets/icons/coin.svg',
+                          width: 20,
+                          height: 20,
+                        ),
+                      ],
+                    ),
                   ),
                   Gap(20),
                 ],

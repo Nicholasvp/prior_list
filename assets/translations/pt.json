@@ -1,0 +1,57 @@
+{
+  "search": "Pesquisar...",
+  "create": "Criar",
+  "error_loading_data": "Erro ao carregar os dados",
+  "no_items_found": "Nenhum item encontrado",
+  "no_items_match_search": "Nenhum item corresponde à sua pesquisa",
+  
+  "priority": {
+    "high": "Alta",
+    "medium": "Média",
+    "low": "Baixa"
+  },
+  
+  "item": {
+    "due_date": "Vencimento: {date}",
+    "no_due_date": "Sem data de vencimento"
+  },
+  
+  "actions": {
+    "open_link": "Abrir Link",
+    "delete": "Excluir"
+  },
+  
+  "form": {
+    "title": "Adicionar Novo Item",
+    "name": {
+      "label": "Nome",
+      "hint": "Digite o nome",
+      "validation": "Por favor, digite um nome"
+    },
+    "date": {
+      "label": "Data",
+      "hint": "Selecione uma data",
+      "validation_future": "Por favor, selecione uma data/hora futura"
+    },
+    "link": {
+      "label": "Link URL",
+      "hint": "Digite o link URL"
+    },
+    "priority": {
+      "label": "Prioridade"
+    }
+  },
+  
+  "button": {
+    "cost": "3"
+  },
+  "confirm_deletion": "Confirmar Exclusão",
+  "delete_item_question": "Tem certeza que deseja excluir este item?",
+  "delete_cost": "Isso custará {cost} moeda",
+  "cancel": "Cancelar",
+  "delete": "Excluir",
+  "not_enough_coins_delete": "Você não tem moedas suficientes para excluir este item",
+  "not_enough_coins_anymore": "Moedas insuficientes agora",
+  "item_deleted": "Item excluído com sucesso",
+  "error_deleting_item": "Erro ao excluir o item"
+}

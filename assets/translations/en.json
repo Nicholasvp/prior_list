@@ -1,0 +1,58 @@
+{
+  "search": "Search...",
+  "create": "Create",
+  "error_loading_data": "Error loading data",
+  "no_items_found": "No items found",
+  "no_items_match_search": "No items match your search",
+  
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  
+  "item": {
+    "due_date": "Due: {date}",
+    "no_due_date": "No due date"
+  },
+  
+  "actions": {
+    "open_link": "Open Link",
+    "delete": "Delete"
+  },
+  
+  "form": {
+    "title": "Add New Item",
+    "name": {
+      "label": "Name",
+      "hint": "Enter the name",
+      "validation": "Please enter a name"
+    },
+    "date": {
+      "label": "Date",
+      "hint": "Select a date",
+      "validation_future": "Please select a future time"
+    },
+    "link": {
+      "label": "Link URL",
+      "hint": "Enter the link URL"
+    },
+    "priority": {
+      "label": "Priority"
+    }
+  },
+  
+  "button": {
+    "cost": "3"
+  },
+  "confirm_deletion": "Confirm Deletion",
+  "delete_item_question": "Are you sure you want to delete this item?",
+  "delete_cost": "This will cost {cost} coin",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "not_enough_coins_delete": "You don't have enough coins to delete this item",
+  "not_enough_coins_anymore": "Not enough coins anymore",
+  "item_deleted": "Item deleted successfully",
+  "error_deleting_item": "Error deleting item"
+  
+}

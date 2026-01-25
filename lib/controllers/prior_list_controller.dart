@@ -1,9 +1,13 @@
 import 'dart:convert';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/state_controller.dart';
 import 'package:prior_list/enums/enums.dart';
+import 'package:prior_list/main.dart';
 import 'package:prior_list/models/item_model.dart';
 import 'package:prior_list/repositories/hive_repository.dart';
 import 'package:prior_list/repositories/notification_repository.dart';
@@ -113,6 +117,11 @@ class PriorListController extends StateController {
   }
 
   Future<void> addItem() async {
+    final coinscontroller = autoInjector.get<CoinsController>();
+    if (!coinscontroller.spentToCreate()) {
+      return;
+    }
+
     loading();
     final now = DateTime.now();
     final item = ItemModel(
@@ -148,7 +157,7 @@ class PriorListController extends StateController {
       }
       getList();
     } catch (e) {
-      error();
+      return;
     }
   }
 
@@ -163,12 +172,16 @@ class PriorListController extends StateController {
   }
 
   Future<void> editItem(String id) async {
+    final coinscontroller = autoInjector.get<CoinsController>();
+    if (!coinscontroller.spentToEdit()) {
+      return;
+    }
+
     loading();
     try {
       List<ItemModel> currentList = items.value;
       final idx = currentList.indexWhere((element) => element.id == id);
       if (idx == -1) {
-        error();
         return;
       }
 
@@ -198,44 +211,140 @@ class PriorListController extends StateController {
 
       getList();
     } catch (e) {
-      error();
+      return;
     }
   }
 
   Future<void> deleteItem(String id, BuildContext context) async {
-    bool confim = false;
-    confim =
-        await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Confirm Deletion'),
-            content: const Text('Are you sure you want to delete this item?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Delete'),
-              ),
-            ],
-          ),
-        ) ??
-        false;
+    final coinsController = autoInjector.get<CoinsController>();
 
-    if (confim) {
+    if (coinsController.coins.value < coinsController.costToRemoveItem) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('not_enough_coins_delete'.tr()),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+        contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+        actionsPadding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+        title: Row(
+          children: [
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.redAccent,
+              size: 28,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'confirm_deletion'.tr(),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Colors.redAccent,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'delete_item_question'.tr(),
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/coin.svg',
+                  width: 24,
+                  height: 24,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'delete_cost'.tr(
+                    namedArgs: {
+                      'cost': coinsController.costToRemoveItem.toString(),
+                    },
+                  ),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.orange,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey[700],
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: Text('cancel'.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.redAccent,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              backgroundColor: Colors.red[50],
+            ),
+            child: Text('delete'.tr()),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      // Debita as moedas
+      final success = await coinsController.spentToRemove();
+      if (!success) {
+        // Caso raro de race condition (moedas mudaram entre dialog e confirmação)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('not_enough_coins_anymore'.tr())),
+        );
+        return;
+      }
+
+      // Mostra loading (seu método loading())
       loading();
+
       try {
         List<ItemModel> currentList = items.value;
         currentList.removeWhere((item) => item.id == id);
+
         String jsonString = json.encode(
           currentList.map((item) => item.toJson()).toList(),
         );
+
         await hiveRepository.create('prior_list', jsonString);
         getList();
+
+        // Feedback de sucesso (opcional)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('item_deleted'.tr()),
+            backgroundColor: Colors.green,
+          ),
+        );
       } catch (e) {
-        error();
+        debugPrint('Erro ao deletar item: $e');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('error_deleting_item'.tr())));
       }
     }
   }

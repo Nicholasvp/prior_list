@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
@@ -16,14 +17,14 @@ class EditItemPage extends StatefulWidget {
 }
 
 class _EditItemPageState extends State<EditItemPage> {
-  late final PriorListController controller;
+  late final PriorListController priorListController;
 
   @override
   void initState() {
     super.initState();
-    controller = autoInjector.get<PriorListController>();
-    // populate controllers with item data
-    controller.populateForEdit(widget.item);
+    priorListController = autoInjector.get<PriorListController>();
+
+    priorListController.populateForEdit(widget.item);
   }
 
   @override
@@ -36,44 +37,74 @@ class _EditItemPageState extends State<EditItemPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
-              controller: controller.nomeController,
+              controller: priorListController.nomeController,
               decoration: const InputDecoration(labelText: 'Title'),
             ),
             const SizedBox(height: 12),
-            TextField(
+            TextFormField(
               readOnly: true,
-              controller: controller.dateController,
-              decoration: const InputDecoration(labelText: 'Date (dd/MM/yyyy)'),
+              controller: priorListController.dateController,
+              decoration: InputDecoration(
+                labelText: 'form.date.label'.tr(),
+                hintText: 'form.date.hint'.tr(),
+                suffixIcon: const Icon(Icons.calendar_today),
+              ),
               onTap: () async {
-                DateTime initialDate = DateTime.now();
-                if (controller.dateController.text.isNotEmpty) {
+                final now = DateTime.now();
+
+                DateTime initialDateTime = now;
+                if (priorListController.dateController.text.isNotEmpty) {
                   try {
-                    initialDate = DateFormat(
-                      'dd/MM/yyyy',
-                    ).parse(controller.dateController.text);
+                    initialDateTime = DateFormat(
+                      'dd/MM/yyyy HH:mm',
+                    ).parse(priorListController.dateController.text);
                   } catch (_) {}
                 }
-                final picked = await showDatePicker(
+
+                final pickedDate = await showDatePicker(
                   context: context,
-                  initialDate: initialDate,
-                  firstDate: DateTime(2000),
+                  initialDate: initialDateTime,
+                  firstDate: now,
                   lastDate: DateTime(2100),
                 );
-                if (picked != null) {
-                  controller.dateController.text = DateFormat(
-                    'dd/MM/yyyy',
-                  ).format(picked);
+
+                if (pickedDate == null) return;
+
+                final pickedTime = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.fromDateTime(initialDateTime),
+                );
+
+                if (pickedTime == null) return;
+
+                final selectedDateTime = DateTime(
+                  pickedDate.year,
+                  pickedDate.month,
+                  pickedDate.day,
+                  pickedTime.hour,
+                  pickedTime.minute,
+                );
+
+                if (selectedDateTime.isBefore(now)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('form.date.validation_future'.tr())),
+                  );
+                  return;
                 }
+
+                priorListController.dateController.text = DateFormat(
+                  'dd/MM/yyyy HH:mm',
+                ).format(selectedDateTime);
               },
             ),
             const SizedBox(height: 12),
             TextField(
-              controller: controller.linkUrlController,
+              controller: priorListController.linkUrlController,
               decoration: const InputDecoration(labelText: 'Link URL'),
             ),
             const SizedBox(height: 12),
             ValueListenableBuilder<String>(
-              valueListenable: controller.priorityForm,
+              valueListenable: priorListController.priorityForm,
               builder: (context, value, _) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -82,13 +113,13 @@ class _EditItemPageState extends State<EditItemPage> {
                   Wrap(
                     spacing: 8,
                     children: PriorType.values.map((priorType) {
-                      final name = priorType.name; // low, medium, high
+                      final name = priorType.name;
                       return ChoiceChip(
                         label: Text(name.toUpperCase()),
                         selected: value == name,
                         onSelected: (selected) {
                           if (selected) {
-                            controller.priorityForm.value = name;
+                            priorListController.priorityForm.value = name;
                           }
                         },
                       );
@@ -98,14 +129,11 @@ class _EditItemPageState extends State<EditItemPage> {
               ),
             ),
             const SizedBox(height: 12),
-            ColorPickerWidget(
-              controller: controller,
-            ),
+            ColorPickerWidget(controller: priorListController),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () async {
-                // Chama método de edição no controller
-                await controller.editItem(widget.item.id);
+                await priorListController.editItem(widget.item.id);
                 Navigator.of(context).pop();
               },
               child: const Text('Submit'),

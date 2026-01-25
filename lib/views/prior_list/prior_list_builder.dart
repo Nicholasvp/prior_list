@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:from_css_color/from_css_color.dart';
 import 'package:gap/gap.dart';
@@ -37,7 +38,10 @@ class PriorListBuilder extends StatelessWidget {
                 ),
               ],
               border: Border(
-                left: BorderSide(color: fromCssColor(item.color?? '#fff'), width: 6),
+                left: BorderSide(
+                  color: fromCssColor(item.color ?? '#fff'),
+                  width: 6,
+                ),
               ),
             ),
             child: ListTile(
@@ -53,16 +57,20 @@ class PriorListBuilder extends StatelessWidget {
               },
               title: Text(
                 item.title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               subtitle: Row(
                 children: [
                   Text(
                     item.priorDate != null
-                        ? 'Due: ${DateFormat('dd/MM/yyyy').format(item.priorDate!)}'
-                        : 'No due date',
+                        ? 'item.due_date'.tr(
+                            namedArgs: {
+                              'date': DateFormat(
+                                'dd/MM/yyyy',
+                              ).format(item.priorDate!),
+                            },
+                          )
+                        : 'item.no_due_date'.tr(),
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                   Gap(10),
@@ -84,7 +92,7 @@ class PriorListBuilder extends StatelessWidget {
                       style: const TextStyle(
                         color: Colors.black87,
                         fontWeight: FontWeight.w500,
-                        fontSize: 10
+                        fontSize: 10,
                       ),
                     ),
                   ),
@@ -114,7 +122,8 @@ class PriorListBuilder extends StatelessWidget {
                       icon: HugeIcons.strokeRoundedDelete01,
                       color: Colors.black,
                     ),
-                    onPressed: () => priorListController.deleteItem(item.id, context),
+                    onPressed: () =>
+                        priorListController.deleteItem(item.id, context),
                     tooltip: 'Excluir',
                   ),
                 ],

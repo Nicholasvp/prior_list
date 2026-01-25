@@ -1,16 +1,18 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:hugeicons/styles/stroke_rounded.dart';
 import 'package:prior_list/controllers/ad_mob_controller.dart';
+import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/views/prior_list/prior_list_builder.dart';
 import 'package:prior_list/models/item_model.dart';
 
 class PriorListPage extends StatefulWidget {
-  final bool showSearch;
-
-  const PriorListPage({super.key, this.showSearch = true});
+  const PriorListPage({super.key});
 
   @override
   State<PriorListPage> createState() => _PriorListPageState();
@@ -21,10 +23,12 @@ class _PriorListPageState extends State<PriorListPage> {
   String _query = '';
   final priorListController = autoInjector.get<PriorListController>();
   final adMobController = autoInjector.get<AdMobController>();
+  final coinsController = autoInjector.get<CoinsController>();
 
   @override
   void didChangeDependencies() {
-    adMobController.loadAd(context);
+    coinsController.fetchCoins();
+    adMobController.loadRewardedAd();
     super.didChangeDependencies();
   }
 
@@ -95,66 +99,50 @@ class _PriorListPageState extends State<PriorListPage> {
     return SafeArea(
       child: Column(
         children: [
-          ValueListenableBuilder(
-            valueListenable: adMobController.bannerAd,
-            builder: (context, BannerAd? bannerAd, child) {
-              if (bannerAd != null) {
-                return Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    width: bannerAd.size.width.toDouble(),
-                    height: bannerAd.size.height.toDouble(),
-                    child: AdWidget(ad: bannerAd),
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-          if (widget.showSearch)
-            Padding(
-              padding: const EdgeInsets.all(18),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search...',
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: FittedBox(
-                              fit: BoxFit.contain,
-                              child: const HugeIcon(
-                                icon: HugeIcons.strokeRoundedSearchCircle,
-                                color: Colors.black,
-                              ),
+          MenuCoins(coinsController: coinsController, adMobController: adMobController),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'search'.tr(),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: const HugeIcon(
+                              icon: HugeIcons.strokeRoundedSearchCircle,
+                              color: Colors.black,
                             ),
                           ),
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
                       ),
-                      onChanged: (val) {
-                        setState(() => _query = val);
-                        priorListController.search(_query);
-                      },
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
+                    onChanged: (val) {
+                      setState(() => _query = val);
+                      priorListController.search(_query);
+                    },
                   ),
-                  IconButton(
-                    icon: const HugeIcon(
-                      icon: HugeIcons.strokeRoundedFilter,
-                      color: Colors.black,
-                    ),
-                    onPressed: _openSortModal,
+                ),
+                IconButton(
+                  icon: const HugeIcon(
+                    icon: HugeIcons.strokeRoundedFilter,
+                    color: Colors.black,
                   ),
-                ],
-              ),
+                  onPressed: _openSortModal,
+                ),
+              ],
             ),
+          ),
           Expanded(
             child: ValueListenableBuilder(
               valueListenable: priorListController.state,
@@ -162,15 +150,13 @@ class _PriorListPageState extends State<PriorListPage> {
                 if (priorListController.isLoadingNotifier.value) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (priorListController.hasErrorNotifier.value) {
-                  return const Center(child: Text('Error loading data'));
+                  return Center(child: Text('error_loading_data'.tr()));
                 } else if (priorListController.items.value.isEmpty) {
-                  return const Center(child: Text('No items found'));
+                  return Center(child: Text('no_items_found'.tr()));
                 } else {
                   List<ItemModel> items = priorListController.items.value;
                   if (items.isEmpty) {
-                    return const Center(
-                      child: Text('No items match your search'),
-                    );
+                    return Center(child: Text('no_items_match_search'.tr()));
                   }
                   return PriorListBuilder(items: items);
                 }
@@ -179,6 +165,58 @@ class _PriorListPageState extends State<PriorListPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class MenuCoins extends StatelessWidget {
+  const MenuCoins({
+    super.key,
+    required this.coinsController,
+    required this.adMobController,
+  });
+
+  final CoinsController coinsController;
+  final AdMobController adMobController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Gap(20),
+        SvgPicture.asset('assets/icons/coin.svg', width: 32, height: 32),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: ValueListenableBuilder(
+            valueListenable: coinsController.coins,
+            builder: (context, value, child) {
+              return Text(
+                coinsController.coins.value.toString(),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
+          ),
+        ),
+        IconButton(
+          onPressed: () {
+            adMobController.showRewardedAd(
+              onUserEarnedReward: () {
+                coinsController.addCoin(5);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Você ganhou 5 moedas!')),
+                );
+              },
+            );
+          },
+          icon: const HugeIcon(
+            icon: HugeIconsStrokeRounded.addCircle,
+            color: Colors.black,
+          ),
+        ),
+      ],
     );
   }
 }
