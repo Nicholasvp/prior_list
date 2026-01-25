@@ -204,9 +204,9 @@ class MenuCoins extends StatelessWidget {
           onPressed: () {
             adMobController.showRewardedAd(
               onUserEarnedReward: () {
-                coinsController.addCoin(5);
+                coinsController.addCoins(coinsController.reward);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Você ganhou 5 moedas!')),
+                  SnackBar(content: Text('message_reward'.tr(namedArgs: {'coins': coinsController.reward.toString()}))),
                 );
               },
             );

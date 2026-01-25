@@ -164,7 +164,7 @@ class ButtomSheetItemForm extends StatelessWidget {
                       children: [
                         Text('create'.tr()),
                         Gap(20),
-                        Text('button.cost'.tr()),
+                        Text(coinscontroller.costToAddItem.toString()),
                         Gap(5),
                         SvgPicture.asset(
                           'assets/icons/coin.svg',

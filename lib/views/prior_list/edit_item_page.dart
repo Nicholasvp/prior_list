@@ -1,6 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
+import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/models/item_model.dart';
@@ -17,12 +20,13 @@ class EditItemPage extends StatefulWidget {
 }
 
 class _EditItemPageState extends State<EditItemPage> {
-  late final PriorListController priorListController;
+  
+  final  priorListController = autoInjector.get<PriorListController>();
+  final coinsController = autoInjector.get<CoinsController>();
 
   @override
   void initState() {
     super.initState();
-    priorListController = autoInjector.get<PriorListController>();
 
     priorListController.populateForEdit(widget.item);
   }
@@ -132,11 +136,25 @@ class _EditItemPageState extends State<EditItemPage> {
             ColorPickerWidget(controller: priorListController),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () async {
+              
+              onPressed: coinsController.hasEnoughToEditItem? () async {
                 await priorListController.editItem(widget.item.id);
                 Navigator.of(context).pop();
-              },
-              child: const Text('Submit'),
+              } : null,
+              child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('edit'.tr()),
+                        Gap(20),
+                        Text(coinsController.costToEditItem.toString()),
+                        Gap(5),
+                        SvgPicture.asset(
+                          'assets/icons/coin.svg',
+                          width: 20,
+                          height: 20,
+                        ),
+                      ],
+                    ),
             ),
             const SizedBox(height: 12),
             OutlinedButton(

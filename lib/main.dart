@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // context.setLocale(Locale('pt'));
+    context.setLocale(Locale('en'));
     return MaterialApp(
       title: 'Prior List',
       supportedLocales: context.supportedLocales,

@@ -9,13 +9,17 @@ class CoinsController {
   int costToAddItem = 3;
   int costToRemoveItem = 1;
   int costToEditItem = 2;
+  
+  int reward = 10;
 
   bool get hasEnoughToAddItem => coins.value >= costToAddItem;
+  bool get hasEnoughToRemoveItem => coins.value >= costToRemoveItem;
+  bool get hasEnoughToEditItem => coins.value >= costToEditItem;
 
   void fetchCoins() async {
     coins.value = await hiveRepository.read('coins') ?? 0;
   }
-  void addCoin(int value) {
+  void addCoins(int value) {
     hiveRepository.create('coins', coins.value + value);
     fetchCoins();
   }

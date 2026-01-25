@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+
 import 'dart:convert';
 
 import 'package:prior_list/enums/enums.dart';
@@ -11,6 +11,7 @@ class ItemModel {
   final String? linkUrl;
   final PriorType priorType;
   final String? color;
+  final bool completed;           
 
   ItemModel({
     required this.id,
@@ -20,6 +21,7 @@ class ItemModel {
     this.linkUrl,
     required this.priorType,
     this.color,
+    this.completed = false,       
   });
 
   ItemModel copyWith({
@@ -30,15 +32,17 @@ class ItemModel {
     String? linkUrl,
     PriorType? priorType,
     String? color,
+    bool? completed,              
   }) {
     return ItemModel(
       id: id ?? this.id,
       title: title ?? this.title,
       createdAt: createdAt ?? this.createdAt,
       priorDate: priorDate ?? this.priorDate,
-      priorType: priorType ?? this.priorType,
       linkUrl: linkUrl ?? this.linkUrl,
+      priorType: priorType ?? this.priorType,
       color: color ?? this.color,
+      completed: completed ?? this.completed,   
     );
   }
 
@@ -51,6 +55,7 @@ class ItemModel {
       'linkUrl': linkUrl,
       'priorType': priorType.name,
       'color': color,
+      'completed': completed,                    
     };
   }
 
@@ -62,11 +67,12 @@ class ItemModel {
       priorDate: map['priorDate'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['priorDate'] as int)
           : null,
-      linkUrl: map['linkUrl'] as String? ?? '',
+      linkUrl: map['linkUrl'] as String?,
       priorType: map['priorType'] != null
           ? transformToPriotType[map['priorType']]!
           : PriorType.low,
       color: map['color'] as String?,
+      completed: map['completed'] as bool? ?? false,   
     );
   }
 
@@ -77,7 +83,9 @@ class ItemModel {
 
   @override
   String toString() {
-    return 'ItemModel(id: $id, title: $title, createdAt: $createdAt, priorDate: $priorDate, linkUrl: $linkUrl, priorType: $priorType, color: $color)';
+    return 'ItemModel(id: $id, title: $title, createdAt: $createdAt, '
+        'priorDate: $priorDate, linkUrl: $linkUrl, priorType: $priorType, '
+        'color: $color, completed: $completed)';
   }
 
   @override
@@ -90,7 +98,8 @@ class ItemModel {
         other.priorDate == priorDate &&
         other.linkUrl == linkUrl &&
         other.priorType == priorType &&
-        other.color == color;
+        other.color == color &&
+        other.completed == completed;           
   }
 
   @override
@@ -101,6 +110,7 @@ class ItemModel {
         priorDate.hashCode ^
         linkUrl.hashCode ^
         priorType.hashCode ^
-        color.hashCode;
+        color.hashCode ^
+        completed.hashCode;                     
   }
 }

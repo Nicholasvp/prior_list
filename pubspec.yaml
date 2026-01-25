@@ -27,6 +27,12 @@ dependencies:
   from_css_color: ^2.0.0
   google_mobile_ads: ^7.0.0
   flutter_svg: ^2.2.3
+  flutter_native_splash: ^2.4.7
+  flutter_launcher_icons: ^0.14.4
+
+flutter_native_splash:
+  image: assets/images/icon_prior_list.png
+  color: "#FFFFFF"
 
 dev_dependencies:
   flutter_test:

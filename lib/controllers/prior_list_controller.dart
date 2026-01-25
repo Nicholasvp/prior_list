@@ -75,18 +75,56 @@ class PriorListController extends StateController {
     if (criteria == 'date') {
       sortedItems.sort(
         (a, b) =>
-            (a.priorDate ?? DateTime(0)).compareTo(b.priorDate ?? DateTime(0)),
+            (a.priorDate ?? DateTime(3000)).compareTo(b.priorDate ?? DateTime(3000)),
       );
     } else if (criteria == 'alphabetical') {
       sortedItems.sort((a, b) => a.title.compareTo(b.title));
     } else if (criteria == 'priority') {
       sortedItems.sort(
-        (a, b) => a.priorType.index.compareTo(b.priorType.index),
+        (a, b) => b.priorType.index.compareTo(a.priorType.index),
       );
     }
     items.value = sortedItems;
     completed();
   }
+
+void completeItem(ItemModel item) {
+  loading();
+
+  try {
+    final currentList = List<ItemModel>.from(items.value);
+
+    final index = currentList.indexWhere((i) => i.id == item.id);
+    if (index == -1) {
+      completed();
+      return;
+    }
+
+    final updatedItem = currentList[index].copyWith(
+      completed: true,
+    );
+
+    currentList[index] = updatedItem;
+
+    items.value = currentList;
+
+    final jsonString = json.encode(
+      currentList.map((i) => i.toJson()).toList(),
+    );
+    hiveRepository.create('prior_list', jsonString);
+
+    final allIndex = _allItems.indexWhere((i) => i.id == item.id);
+    if (allIndex != -1) {
+      _allItems[allIndex] = updatedItem;
+    }
+
+    completed();
+    
+  } catch (e) {
+    debugPrint('Erro ao completar item: $e');
+    error();
+  }
+}
 
   Future<void> search(String query) async {
     loading();

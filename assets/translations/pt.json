@@ -1,10 +1,11 @@
 {
   "search": "Pesquisar...",
   "create": "Criar",
+  "edit": "Editar",
   "error_loading_data": "Erro ao carregar os dados",
   "no_items_found": "Nenhum item encontrado",
   "no_items_match_search": "Nenhum item corresponde à sua pesquisa",
-  
+  "message_reward": "Você ganhou {coins} moedas!",
   "priority": {
     "high": "Alta",
     "medium": "Média",
@@ -40,10 +41,6 @@
     "priority": {
       "label": "Prioridade"
     }
-  },
-  
-  "button": {
-    "cost": "3"
   },
   "confirm_deletion": "Confirmar Exclusão",
   "delete_item_question": "Tem certeza que deseja excluir este item?",
