@@ -51,5 +51,11 @@
   "not_enough_coins_delete": "Você não tem moedas suficientes para excluir este item",
   "not_enough_coins_anymore": "Moedas insuficientes agora",
   "item_deleted": "Item excluído com sucesso",
-  "error_deleting_item": "Erro ao excluir o item"
+  "error_deleting_item": "Erro ao excluir o item",
+  "item_completed": "Item concluído com sucesso!",
+  "status_filters": {
+    "all": "Todos",
+    "completed": "Concluídos",
+    "pending": "Pendentes"
+  }
 }

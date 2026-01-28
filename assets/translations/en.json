@@ -51,6 +51,11 @@
   "not_enough_coins_delete": "You don't have enough coins to delete this item",
   "not_enough_coins_anymore": "Not enough coins anymore",
   "item_deleted": "Item deleted successfully",
-  "error_deleting_item": "Error deleting item"
-  
+  "error_deleting_item": "Error deleting item",
+  "item_completed": "Item completed successfully!",
+  "status_filters": {
+    "all": "All",
+    "completed": "Completed",
+    "pending": "Pending"
+  }
 }

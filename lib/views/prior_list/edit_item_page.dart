@@ -131,9 +131,9 @@ class _EditItemPageState extends State<EditItemPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            Gap(12),
             ColorPickerWidget(controller: priorListController),
-            const SizedBox(height: 24),
+            Gap(24),
             ElevatedButton(
               onPressed: coinsController.hasEnoughToEditItem? () async {
                 await priorListController.editItem(widget.item);
@@ -154,12 +154,27 @@ class _EditItemPageState extends State<EditItemPage> {
                       ],
                     ),
             ),
-            const SizedBox(height: 12),
+            Gap(12),
             OutlinedButton(
-              onPressed: () {
+              onPressed: coinsController.hasEnoughToRemoveItem? () async {
+                await priorListController.deleteItem(widget.item.id, context);
                 Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
+                
+              } : null,
+              child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('delete'.tr()),
+                        Gap(20),
+                        Text(coinsController.costToRemoveItem.toString()),
+                        Gap(5),
+                        SvgPicture.asset(
+                          'assets/icons/coin.svg',
+                          width: 20,
+                          height: 20,
+                        ),
+                      ],
+                    ),
             ),
           ],
         ),

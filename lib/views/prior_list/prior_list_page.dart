@@ -10,6 +10,8 @@ import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/views/prior_list/prior_list_builder.dart';
 import 'package:prior_list/models/item_model.dart';
+import 'package:prior_list/widgets/choice_filter_menu.dart';
+import 'package:prior_list/widgets/search_menu.dart';
 
 class PriorListPage extends StatefulWidget {
   const PriorListPage({super.key});
@@ -19,8 +21,8 @@ class PriorListPage extends StatefulWidget {
 }
 
 class _PriorListPageState extends State<PriorListPage> {
-  final TextEditingController _searchController = TextEditingController();
-  String _query = '';
+  final TextEditingController searchController = TextEditingController();
+  String query = '';
   final priorListController = autoInjector.get<PriorListController>();
   final adMobController = autoInjector.get<AdMobController>();
   final coinsController = autoInjector.get<CoinsController>();
@@ -32,60 +34,68 @@ class _PriorListPageState extends State<PriorListPage> {
     super.didChangeDependencies();
   }
 
-  void _openSortModal() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  icon: HugeIcon(
-                    icon: HugeIcons.strokeRoundedCalendar01,
-                    color: Colors.black,
-                  ),
-                  onPressed: () {
-                    priorListController.sortItems('date');
-                    Navigator.pop(context);
-                  },
-                ),
-                IconButton(
-                  icon: HugeIcon(
-                    icon: HugeIcons.strokeRoundedArrangeByLettersAZ,
-                    color: Colors.black,
-                  ),
-                  onPressed: () {
-                    priorListController.sortItems('alphabetical');
-                    Navigator.pop(context);
-                  },
-                ),
-                IconButton(
-                  icon: HugeIcon(
-                    icon: HugeIcons.strokeRoundedTemperature,
-                    color: Colors.black,
-                  ),
-                  onPressed: () {
-                    priorListController.sortItems('priority');
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
+  void openSortModal() {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return ValueListenableBuilder<String>(
+        valueListenable: priorListController.sortType,
+        builder: (context, active, child) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-          ),
-        );
-      },
-    );
-  }
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Data
+                  IconButton(
+                    icon: HugeIcon(
+                      icon: HugeIcons.strokeRoundedCalendar01,
+                      color: active == 'date' ? Colors.blue : Colors.black,
+                    ),
+                    onPressed: () {
+                      priorListController.changeSort('date');
+                      Navigator.pop(context);
+                    },
+                  ),
+                  // Nome (alfabética)
+                  IconButton(
+                    icon: HugeIcon(
+                      icon: HugeIcons.strokeRoundedArrangeByLettersAZ,
+                      color: active == 'name' ? Colors.blue : Colors.black,
+                    ),
+                    onPressed: () {
+                      priorListController.changeSort('name');
+                      Navigator.pop(context);
+                    },
+                  ),
+                  // Prioridade
+                  IconButton(
+                    icon: HugeIcon(
+                      icon: HugeIcons.strokeRoundedTemperature,
+                      color: active == 'priority' ? Colors.blue : Colors.black,
+                    ),
+                    onPressed: () {
+                      priorListController.changeSort('priority');
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 
   @override
   void dispose() {
-    _searchController.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
@@ -100,49 +110,17 @@ class _PriorListPageState extends State<PriorListPage> {
       child: Column(
         children: [
           MenuCoins(coinsController: coinsController, adMobController: adMobController),
-          Padding(
-            padding: const EdgeInsets.all(18),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'search'.tr(),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: FittedBox(
-                            fit: BoxFit.contain,
-                            child: const HugeIcon(
-                              icon: HugeIcons.strokeRoundedSearchCircle,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onChanged: (val) {
-                      setState(() => _query = val);
-                      priorListController.search(_query);
-                    },
-                  ),
-                ),
-                IconButton(
-                  icon: const HugeIcon(
-                    icon: HugeIcons.strokeRoundedFilter,
-                    color: Colors.black,
-                  ),
-                  onPressed: _openSortModal,
-                ),
-              ],
-            ),
-          ),
+          SearchMenu(
+            priorListController: priorListController,
+      searchController: searchController,
+      onSearchChanged: (val) {
+        setState(() => query = val);
+        priorListController.search(query);
+      },
+      onFilterPressed: openSortModal,
+    ),
+    Gap(8),
+    ChoiceFilterMenu(),
           Expanded(
             child: ValueListenableBuilder(
               valueListenable: priorListController.state,

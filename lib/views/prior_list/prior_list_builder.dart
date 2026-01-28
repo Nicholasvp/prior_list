@@ -23,11 +23,13 @@ class PriorListBuilder extends StatelessWidget {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
+        final isCompleted = item.completed;
+
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: isCompleted ? Colors.grey[200] : Colors.grey[50],
               borderRadius: BorderRadius.circular(12.0),
               boxShadow: [
                 BoxShadow(
@@ -48,15 +50,20 @@ class PriorListBuilder extends StatelessWidget {
                 horizontal: 16.0,
                 vertical: 12.0,
               ),
-              onTap: () {
-                priorListController.populateForEdit(item);
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => EditItemPage(item: item)),
-                );
-              },
+              onTap: 
+                  () {
+                      priorListController.populateForEdit(item);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => EditItemPage(item: item)),
+                      );
+                    },
               title: Text(
                 item.title,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  decoration: isCompleted ? TextDecoration.lineThrough : null,
+                  color: isCompleted ? Colors.grey[700] : null,
+                ),
               ),
               subtitle: Row(
                 children: [
@@ -64,9 +71,7 @@ class PriorListBuilder extends StatelessWidget {
                     item.priorDate != null
                         ? 'item.due_date'.tr(
                             namedArgs: {
-                              'date': DateFormat(
-                                'dd/MM - HH:mm',
-                              ).format(item.priorDate!),
+                              'date': DateFormat('dd/MM - HH:mm').format(item.priorDate!),
                             },
                           )
                         : 'item.no_due_date'.tr(),
@@ -117,13 +122,25 @@ class PriorListBuilder extends StatelessWidget {
                     Gap(3),
                   ],
                   IconButton(
-                    icon: const HugeIcon(
-                      icon: HugeIcons.strokeRoundedDelete01,
-                      color: Colors.black,
+                    icon: HugeIcon(
+                      icon: isCompleted
+                          ? HugeIcons.strokeRoundedCheckmarkCircle01
+                          : HugeIcons.strokeRoundedCheckmarkCircle02,
+                      color: isCompleted ? Colors.green : Colors.black,
                     ),
-                    onPressed: () =>
-                        priorListController.deleteItem(item.id, context),
-                    tooltip: 'Excluir',
+                    onPressed: isCompleted
+                        ? () => priorListController.uncompleteItem(item) 
+                        : () {
+                            priorListController.completeItem(item);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('item_completed'.tr()),
+                                duration: const Duration(seconds: 2),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          },
+                    tooltip: isCompleted ? 'Concluído' : 'Completar',
                   ),
                 ],
               ),
