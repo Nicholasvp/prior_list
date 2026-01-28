@@ -1,9 +1,7 @@
 import 'dart:convert';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
 import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/state_controller.dart';
 import 'package:prior_list/enums/enums.dart';
@@ -74,8 +72,9 @@ class PriorListController extends StateController {
     List<ItemModel> sortedItems = List<ItemModel>.from(items.value);
     if (criteria == 'date') {
       sortedItems.sort(
-        (a, b) =>
-            (a.priorDate ?? DateTime(3000)).compareTo(b.priorDate ?? DateTime(3000)),
+        (a, b) => (a.priorDate ?? DateTime(3000)).compareTo(
+          b.priorDate ?? DateTime(3000),
+        ),
       );
     } else if (criteria == 'alphabetical') {
       sortedItems.sort((a, b) => a.title.compareTo(b.title));
@@ -88,43 +87,40 @@ class PriorListController extends StateController {
     completed();
   }
 
-void completeItem(ItemModel item) {
-  loading();
+  void completeItem(ItemModel item) {
+    loading();
 
-  try {
-    final currentList = List<ItemModel>.from(items.value);
+    try {
+      final currentList = List<ItemModel>.from(items.value);
 
-    final index = currentList.indexWhere((i) => i.id == item.id);
-    if (index == -1) {
+      final index = currentList.indexWhere((i) => i.id == item.id);
+      if (index == -1) {
+        completed();
+        return;
+      }
+
+      final updatedItem = currentList[index].copyWith(completed: true);
+
+      currentList[index] = updatedItem;
+
+      items.value = currentList;
+
+      final jsonString = json.encode(
+        currentList.map((i) => i.toJson()).toList(),
+      );
+      hiveRepository.create('prior_list', jsonString);
+
+      final allIndex = _allItems.indexWhere((i) => i.id == item.id);
+      if (allIndex != -1) {
+        _allItems[allIndex] = updatedItem;
+      }
+
       completed();
-      return;
+    } catch (e) {
+      debugPrint('Erro ao completar item: $e');
+      error();
     }
-
-    final updatedItem = currentList[index].copyWith(
-      completed: true,
-    );
-
-    currentList[index] = updatedItem;
-
-    items.value = currentList;
-
-    final jsonString = json.encode(
-      currentList.map((i) => i.toJson()).toList(),
-    );
-    hiveRepository.create('prior_list', jsonString);
-
-    final allIndex = _allItems.indexWhere((i) => i.id == item.id);
-    if (allIndex != -1) {
-      _allItems[allIndex] = updatedItem;
-    }
-
-    completed();
-    
-  } catch (e) {
-    debugPrint('Erro ao completar item: $e');
-    error();
   }
-}
 
   Future<void> search(String query) async {
     loading();
@@ -202,14 +198,14 @@ void completeItem(ItemModel item) {
   void populateForEdit(ItemModel item) {
     nomeController.text = item.title;
     dateController.text = item.priorDate != null
-        ? DateFormat('dd/MM/yyyy').format(item.priorDate!)
+        ? DateFormat('dd/MM/yyyy HH:mm').format(item.priorDate!)
         : '';
     linkUrlController.text = item.linkUrl ?? '';
     priorityForm.value = item.priorType.name.toLowerCase();
     selectedColor.value = item.color;
   }
 
-  Future<void> editItem(String id) async {
+  Future<void> editItem(ItemModel item) async {
     final coinscontroller = autoInjector.get<CoinsController>();
     if (!coinscontroller.spentToEdit()) {
       return;
@@ -218,7 +214,7 @@ void completeItem(ItemModel item) {
     loading();
     try {
       List<ItemModel> currentList = items.value;
-      final idx = currentList.indexWhere((element) => element.id == id);
+      final idx = currentList.indexWhere((element) => element.id == item.id);
       if (idx == -1) {
         return;
       }
@@ -226,7 +222,7 @@ void completeItem(ItemModel item) {
       final updated = currentList[idx].copyWith(
         title: nomeController.text,
         priorDate: dateController.text.isNotEmpty
-            ? DateFormat('dd/MM/yyyy').parse(dateController.text)
+            ? DateFormat('dd/MM/yyyy HH:mm').parse(dateController.text)
             : null,
         linkUrl: linkUrlController.text,
         priorType: transformToPriotType[priorityForm.value] ?? PriorType.low,
@@ -238,7 +234,22 @@ void completeItem(ItemModel item) {
       String jsonString = json.encode(
         currentList.map((item) => item.toJson()).toList(),
       );
+
       await hiveRepository.create('prior_list', jsonString);
+
+      final priorDate = updated.priorDate;
+      
+      if (priorDate != null) {
+        NotificationRepository().scheduleNotification(
+          title: 'reminder'.tr(),
+          body: updated.title, // também usar o título atualizado
+          year: priorDate.year,
+          month: priorDate.month,
+          day: priorDate.day,
+          hour: priorDate.hour,
+          minute: priorDate.minute,
+        );
+      }
 
       // limpa campos
       nomeController.clear();
@@ -348,7 +359,7 @@ void completeItem(ItemModel item) {
 
     if (confirmed == true) {
       // Debita as moedas
-      final success = await coinsController.spentToRemove();
+      final success =  coinsController.spentToRemove();
       if (!success) {
         // Caso raro de race condition (moedas mudaram entre dialog e confirmação)
         ScaffoldMessenger.of(context).showSnackBar(

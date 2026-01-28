@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
 import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
@@ -136,9 +135,8 @@ class _EditItemPageState extends State<EditItemPage> {
             ColorPickerWidget(controller: priorListController),
             const SizedBox(height: 24),
             ElevatedButton(
-              
               onPressed: coinsController.hasEnoughToEditItem? () async {
-                await priorListController.editItem(widget.item.id);
+                await priorListController.editItem(widget.item);
                 Navigator.of(context).pop();
               } : null,
               child: Row(

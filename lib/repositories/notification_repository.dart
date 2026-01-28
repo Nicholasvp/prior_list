@@ -6,7 +6,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 class NotificationRepository {
   final notificationPlugin = FlutterLocalNotificationsPlugin();
 
-  bool _isInitialized = false;
+  final bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
   // INITIALIZE
@@ -68,7 +68,7 @@ class NotificationRepository {
     required int minute,
   }) async {
     // final now = tz.TZDateTime.now(tz.local);
-
+    id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     var scheduledDate = tz.TZDateTime(
       tz.local,
       year,

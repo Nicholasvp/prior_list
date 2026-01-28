@@ -2,6 +2,7 @@
   "search": "Pesquisar...",
   "create": "Criar",
   "edit": "Editar",
+  "reminder": "Lembrete",
   "error_loading_data": "Erro ao carregar os dados",
   "no_items_found": "Nenhum item encontrado",
   "no_items_match_search": "Nenhum item corresponde à sua pesquisa",
@@ -13,8 +14,8 @@
   },
   
   "item": {
-    "due_date": "Vencimento: {date}",
-    "no_due_date": "Sem data de vencimento"
+    "due_date": "Data: {date}",
+    "no_due_date": "Sem data"
   },
   
   "actions": {

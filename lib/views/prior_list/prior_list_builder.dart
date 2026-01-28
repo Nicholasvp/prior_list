@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:from_css_color/from_css_color.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:intl/intl.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/enums/enums.dart';
 import 'package:prior_list/main.dart';
@@ -66,7 +65,7 @@ class PriorListBuilder extends StatelessWidget {
                         ? 'item.due_date'.tr(
                             namedArgs: {
                               'date': DateFormat(
-                                'dd/MM/yyyy',
+                                'dd/MM - HH:mm',
                               ).format(item.priorDate!),
                             },
                           )
