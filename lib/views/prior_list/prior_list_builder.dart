@@ -92,7 +92,7 @@ class PriorListBuilder extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: Text(
-                      item.priorType.name.toUpperCase(),
+                      'priority.${item.priorType.name}'.tr().toUpperCase(),
                       style: const TextStyle(
                         color: Colors.black87,
                         fontWeight: FontWeight.w500,

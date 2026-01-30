@@ -28,9 +28,11 @@ class _PriorListPageState extends State<PriorListPage> {
   final coinsController = autoInjector.get<CoinsController>();
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     coinsController.fetchCoins();
     adMobController.loadRewardedAd();
+    await priorListController.getList();
+    priorListController.changeStatus('pending');
     super.didChangeDependencies();
   }
 
@@ -101,10 +103,6 @@ class _PriorListPageState extends State<PriorListPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (priorListController.items.value.isEmpty &&
-        !priorListController.isLoadingNotifier.value) {
-      priorListController.getList();
-    }
 
     return SafeArea(
       child: Column(

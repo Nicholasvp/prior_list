@@ -27,7 +27,7 @@ class PriorListController extends StateController {
   final showOnlyCompleted = ValueNotifier<bool>(false);
 
   final sortType = ValueNotifier<String>('none');
-  final statusFilter = ValueNotifier<String>('all');
+  final statusFilter = ValueNotifier<String>('');
 
   int get totalItems => _allItems.length;
   int get completedItems => _allItems.where((item) => item.completed).length;
