@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart'; // para debugPrint
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-class AdMobController with ChangeNotifier { // opcional: use ChangeNotifier se quiser rebuild UI ao carregar
+class AdMobController  { // opcional: use ChangeNotifier se quiser rebuild UI ao carregar
   RewardedAd? _rewardedAd;
-  bool isLoading = false;
+  final isLoadingNotifier = ValueNotifier(false);
+  bool get isLoading => isLoadingNotifier.value;
+  set isLoading(bool value) => isLoadingNotifier.value = value;
 
   // Getter para checar se o ad está pronto
   bool get isAdReady => _rewardedAd != null;
@@ -15,22 +17,21 @@ class AdMobController with ChangeNotifier { // opcional: use ChangeNotifier se q
     RewardedAd.load(
       adUnitId: kDebugMode
           ? 'ca-app-pub-3940256099942544/1712485313' // test ID
-          : 'ca-app-pub-4279139452834583/5082181451', // troque quando for publicar
+          // : 'ca-app-pub-4279139452834583/5082181451', // troque quando for publicar
+          : 'ca-app-pub-3940256099942544/1712485313', // troque quando for publicar
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (RewardedAd ad) {
           debugPrint('Rewarded ad loaded successfully');
           _rewardedAd = ad;
           isLoading = false;
-          notifyListeners(); // se usar ChangeNotifier
         },
         onAdFailedToLoad: (LoadAdError error) {
           debugPrint('Rewarded ad failed to load: $error');
           _rewardedAd = null;
           isLoading = false;
-          notifyListeners();
           // Opcional: tente recarregar após delay
-          Future.delayed(const Duration(seconds: 5), loadRewardedAd);
+          Future.delayed(const Duration(seconds: 1), loadRewardedAd);
         },
       ),
     );
@@ -55,7 +56,7 @@ class AdMobController with ChangeNotifier { // opcional: use ChangeNotifier se q
         debugPrint('Rewarded ad failed to show: $error');
         ad.dispose();
         _rewardedAd = null;
-        loadRewardedAd();
+        showRewardedAd(onUserEarnedReward: onUserEarnedReward, onAdDismissed: onAdDismissed); // tenta novamente
       },
       onAdDismissedFullScreenContent: (RewardedAd ad) {
         debugPrint('Rewarded ad dismissed');

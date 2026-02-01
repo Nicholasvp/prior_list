@@ -37,63 +37,65 @@ class _PriorListPageState extends State<PriorListPage> {
   }
 
   void openSortModal() {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return ValueListenableBuilder<String>(
-        valueListenable: priorListController.sortType,
-        builder: (context, active, child) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Data
-                  IconButton(
-                    icon: HugeIcon(
-                      icon: HugeIcons.strokeRoundedCalendar01,
-                      color: active == 'date' ? Colors.blue : Colors.black,
-                    ),
-                    onPressed: () {
-                      priorListController.changeSort('date');
-                      Navigator.pop(context);
-                    },
-                  ),
-                  // Nome (alfabética)
-                  IconButton(
-                    icon: HugeIcon(
-                      icon: HugeIcons.strokeRoundedArrangeByLettersAZ,
-                      color: active == 'name' ? Colors.blue : Colors.black,
-                    ),
-                    onPressed: () {
-                      priorListController.changeSort('name');
-                      Navigator.pop(context);
-                    },
-                  ),
-                  // Prioridade
-                  IconButton(
-                    icon: HugeIcon(
-                      icon: HugeIcons.strokeRoundedTemperature,
-                      color: active == 'priority' ? Colors.blue : Colors.black,
-                    ),
-                    onPressed: () {
-                      priorListController.changeSort('priority');
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ValueListenableBuilder<String>(
+          valueListenable: priorListController.sortType,
+          builder: (context, active, child) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-            ),
-          );
-        },
-      );
-    },
-  );
-}
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Data
+                    IconButton(
+                      icon: HugeIcon(
+                        icon: HugeIcons.strokeRoundedCalendar01,
+                        color: active == 'date' ? Colors.blue : Colors.black,
+                      ),
+                      onPressed: () {
+                        priorListController.changeSort('date');
+                        Navigator.pop(context);
+                      },
+                    ),
+                    // Nome (alfabética)
+                    IconButton(
+                      icon: HugeIcon(
+                        icon: HugeIcons.strokeRoundedArrangeByLettersAZ,
+                        color: active == 'name' ? Colors.blue : Colors.black,
+                      ),
+                      onPressed: () {
+                        priorListController.changeSort('name');
+                        Navigator.pop(context);
+                      },
+                    ),
+                    // Prioridade
+                    IconButton(
+                      icon: HugeIcon(
+                        icon: HugeIcons.strokeRoundedTemperature,
+                        color: active == 'priority'
+                            ? Colors.blue
+                            : Colors.black,
+                      ),
+                      onPressed: () {
+                        priorListController.changeSort('priority');
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -103,22 +105,24 @@ class _PriorListPageState extends State<PriorListPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return SafeArea(
       child: Column(
         children: [
-          MenuCoins(coinsController: coinsController, adMobController: adMobController),
+          MenuCoins(
+            coinsController: coinsController,
+            adMobController: adMobController,
+          ),
           SearchMenu(
             priorListController: priorListController,
-      searchController: searchController,
-      onSearchChanged: (val) {
-        setState(() => query = val);
-        priorListController.search(query);
-      },
-      onFilterPressed: openSortModal,
-    ),
-    Gap(8),
-    ChoiceFilterMenu(),
+            searchController: searchController,
+            onSearchChanged: (val) {
+              setState(() => query = val);
+              priorListController.search(query);
+            },
+            onFilterPressed: openSortModal,
+          ),
+          Gap(8),
+          ChoiceFilterMenu(),
           Expanded(
             child: ValueListenableBuilder(
               valueListenable: priorListController.state,
@@ -157,42 +161,78 @@ class MenuCoins extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Gap(20),
-        SvgPicture.asset('assets/icons/coin.svg', width: 32, height: 32),
-        Padding(
-          padding: const EdgeInsets.all(12),
-          child: ValueListenableBuilder(
-            valueListenable: coinsController.coins,
-            builder: (context, value, child) {
-              return Text(
-                coinsController.coins.value.toString(),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+    return ValueListenableBuilder<bool>(
+      valueListenable: adMobController.isLoadingNotifier,
+      builder: (context, isLoading, _) {
+        final isReady = adMobController.isAdReady;
+
+        return Row(
+          children: [
+            const Gap(20),
+            SvgPicture.asset(
+              'assets/icons/coin.svg',
+              width: 32,
+              height: 32,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: ValueListenableBuilder(
+                valueListenable: coinsController.coins,
+                builder: (_, value, __) {
+                  return Text(
+                    value.toString(),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            /// 🎯 ESTADOS DO REWARD
+            if (isReady)
+              IconButton(
+                onPressed: () {
+                  adMobController.showRewardedAd(
+                    onUserEarnedReward: () {
+                      coinsController.addCoins(coinsController.reward);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'message_reward'.tr(
+                              namedArgs: {
+                                'coins': coinsController.reward.toString(),
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                icon: const HugeIcon(
+                  icon: HugeIconsStrokeRounded.addCircle,
+                  color: Colors.black,
                 ),
-              );
-            },
-          ),
-        ),
-        IconButton(
-          onPressed: () {
-            adMobController.showRewardedAd(
-              onUserEarnedReward: () {
-                coinsController.addCoins(coinsController.reward);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('message_reward'.tr(namedArgs: {'coins': coinsController.reward.toString()}))),
-                );
-              },
-            );
-          },
-          icon: const HugeIcon(
-            icon: HugeIconsStrokeRounded.addCircle,
-            color: Colors.black,
-          ),
-        ),
-      ],
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
+
+
