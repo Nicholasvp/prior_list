@@ -16,8 +16,8 @@ class AdMobController  { // opcional: use ChangeNotifier se quiser rebuild UI ao
 
     RewardedAd.load(
       adUnitId: kDebugMode
-          ? 'ca-app-pub-3940256099942544/1712485313' // test ID
-          : 'ca-app-pub-4279139452834583/5257994555', // troque quando for publicar
+          ? 'ca-app-pub-4279139452834583/5099046608' // test ID
+          : 'ca-app-pub-4279139452834583/5099046608', // troque quando for publicar
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (RewardedAd ad) {
