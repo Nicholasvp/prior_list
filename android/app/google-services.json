@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "497775641280",
+    "project_id": "prior-list-efc81",
+    "storage_bucket": "prior-list-efc81.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497775641280:android:e926a2b16de6f0676b6325",
+        "android_client_info": {
+          "package_name": "com.nicholasvp.prior_list"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNOb_Y19MusG3jRaTLLJ4L_Q09POwFGPs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

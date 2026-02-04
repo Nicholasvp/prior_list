@@ -29,6 +29,7 @@ dependencies:
   flutter_svg: ^2.2.3
   flutter_native_splash: ^2.4.7
   flutter_launcher_icons: ^0.14.4
+  firebase_core: ^4.4.0
 
 flutter_native_splash:
   image: assets/images/icon_prior_list.png
