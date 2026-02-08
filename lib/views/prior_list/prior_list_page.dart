@@ -9,6 +9,7 @@ import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/views/prior_list/prior_list_builder.dart';
 import 'package:prior_list/models/item_model.dart';
+import 'package:prior_list/widgets/app_drawer.dart';
 import 'package:prior_list/widgets/choice_filter_menu.dart';
 import 'package:prior_list/widgets/menu_coins.dart';
 import 'package:prior_list/widgets/search_menu.dart';
@@ -107,9 +108,7 @@ class _PriorListPageState extends State<PriorListPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        endDrawer: const Drawer(
-          child: Center(child: Text('Drawer Content')),
-        ),
+        endDrawer:  AppDrawer(),
         body: Column(
           children: [
             Row(
