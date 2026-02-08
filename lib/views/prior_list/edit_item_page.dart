@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
@@ -19,8 +20,7 @@ class EditItemPage extends StatefulWidget {
 }
 
 class _EditItemPageState extends State<EditItemPage> {
-  
-  final  priorListController = autoInjector.get<PriorListController>();
+  final priorListController = autoInjector.get<PriorListController>();
   final coinsController = autoInjector.get<CoinsController>();
 
   @override
@@ -33,7 +33,7 @@ class _EditItemPageState extends State<EditItemPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit item')),
+      appBar: AppBar(title: Text('edit_item'.tr())),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -41,16 +41,22 @@ class _EditItemPageState extends State<EditItemPage> {
           children: [
             TextField(
               controller: priorListController.nomeController,
-              decoration: const InputDecoration(labelText: 'Title'),
+              decoration: InputDecoration(labelText: 'title'.tr()),
             ),
             const SizedBox(height: 12),
             TextFormField(
               readOnly: true,
               controller: priorListController.dateController,
               decoration: InputDecoration(
-                labelText: 'form.date.label'.tr(),
-                hintText: 'form.date.hint'.tr(),
-                suffixIcon: const Icon(Icons.calendar_today),
+                labelText: 'form.notification.label'.tr(),
+                hintText: 'form.notification.hint'.tr(),
+                suffixIcon: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: HugeIcon(
+                    icon: HugeIcons.strokeRoundedNotification01,
+                    color: Colors.black,
+                  ),
+                ),
               ),
               onTap: () async {
                 final now = DateTime.now();
@@ -106,75 +112,79 @@ class _EditItemPageState extends State<EditItemPage> {
               decoration: const InputDecoration(labelText: 'Link URL'),
             ),
             const SizedBox(height: 12),
-            ValueListenableBuilder<String>(
+            Text('form.priority.label'.tr()),
+            Gap(5),
+            ValueListenableBuilder(
               valueListenable: priorListController.priorityForm,
-              builder: (context, value, _) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Priority'),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: PriorType.values.map((priorType) {
-                      final name = priorType.name;
-                      return ChoiceChip(
-                        label: Text(name.toUpperCase()),
-                        selected: value == name,
-                        onSelected: (selected) {
-                          if (selected) {
-                            priorListController.priorityForm.value = name;
-                          }
+              builder: (context, priority, child) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: PriorType.values.map((priorType) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: ChoiceChip(
+                        label: Text('priority.${priorType.name}'.tr()),
+                        selected: priority == priorType.name,
+                        onSelected: (bool selected) {
+                          priorListController.priorityForm.value =
+                              priorType.name;
                         },
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
             Gap(12),
             ColorPickerWidget(controller: priorListController),
             Gap(24),
             ElevatedButton(
-              onPressed: coinsController.hasEnoughToEditItem? () async {
-                await priorListController.editItem(widget.item);
-                Navigator.of(context).pop();
-              } : null,
+              onPressed: coinsController.hasEnoughToEditItem
+                  ? () async {
+                      await priorListController.editItem(widget.item);
+                      Navigator.of(context).pop();
+                    }
+                  : null,
               child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('edit'.tr()),
-                        Gap(20),
-                        Text(coinsController.costToEditItem.toString()),
-                        Gap(5),
-                        SvgPicture.asset(
-                          'assets/icons/coin.svg',
-                          width: 20,
-                          height: 20,
-                        ),
-                      ],
-                    ),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('edit'.tr()),
+                  Gap(20),
+                  Text(coinsController.costToEditItem.toString()),
+                  Gap(5),
+                  SvgPicture.asset(
+                    'assets/icons/coin.svg',
+                    width: 20,
+                    height: 20,
+                  ),
+                ],
+              ),
             ),
             Gap(12),
             OutlinedButton(
-              onPressed: coinsController.hasEnoughToRemoveItem? () async {
-                await priorListController.deleteItem(widget.item.id, context);
-                Navigator.of(context).pop();
-                
-              } : null,
+              onPressed: coinsController.hasEnoughToRemoveItem
+                  ? () async {
+                      await priorListController.deleteItem(
+                        widget.item.id,
+                        context,
+                      );
+                      Navigator.of(context).pop();
+                    }
+                  : null,
               child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('delete'.tr()),
-                        Gap(20),
-                        Text(coinsController.costToRemoveItem.toString()),
-                        Gap(5),
-                        SvgPicture.asset(
-                          'assets/icons/coin.svg',
-                          width: 20,
-                          height: 20,
-                        ),
-                      ],
-                    ),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('delete'.tr()),
+                  Gap(20),
+                  Text(coinsController.costToRemoveItem.toString()),
+                  Gap(5),
+                  SvgPicture.asset(
+                    'assets/icons/coin.svg',
+                    width: 20,
+                    height: 20,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

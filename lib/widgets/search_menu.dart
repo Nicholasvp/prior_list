@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
-import 'package:prior_list/main.dart';
 
 class SearchMenu extends StatelessWidget {
   final TextEditingController searchController;

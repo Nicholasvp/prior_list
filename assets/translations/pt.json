@@ -30,8 +30,8 @@
       "hint": "Digite o nome",
       "validation": "Por favor, digite um nome"
     },
-    "date": {
-      "label": "Data",
+    "notification": {
+      "label": "Notificação",
       "hint": "Selecione uma data",
       "validation_future": "Por favor, selecione uma data/hora futura"
     },
@@ -43,6 +43,8 @@
       "label": "Prioridade"
     }
   },
+  "edit_item": "Editar Item",
+  "title": "Título",
   "confirm_deletion": "Confirmar Exclusão",
   "delete_item_question": "Tem certeza que deseja excluir este item?",
   "delete_cost": "Isso custará {cost} moeda",

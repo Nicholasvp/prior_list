@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/home_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
@@ -58,9 +59,15 @@ class ButtomSheetItemForm extends StatelessWidget {
                     readOnly: true,
                     controller: priorListController.dateController,
                     decoration: InputDecoration(
-                      labelText: 'form.date.label'.tr(),
-                      hintText: 'form.date.hint'.tr(),
-                      suffixIcon: const Icon(Icons.calendar_today),
+                      labelText: 'form.notification.label'.tr(),
+                      hintText: 'form.notification.hint'.tr(),
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: HugeIcon(
+                          icon: HugeIcons.strokeRoundedNotification01,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
                     onTap: () async {
                       final now = DateTime.now();
@@ -101,7 +108,9 @@ class ButtomSheetItemForm extends StatelessWidget {
                       if (selectedDateTime.isBefore(now)) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('form.date.validation_future'.tr()),
+                            content: Text(
+                              'form.notification.validation_future'.tr(),
+                            ),
                           ),
                         );
                         return;

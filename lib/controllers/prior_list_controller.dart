@@ -205,7 +205,7 @@ class PriorListController extends StateController {
 
       if (item.priorDate != null) {
         NotificationRepository().scheduleNotification(
-          title: 'Reminder',
+          title: 'reminder'.tr(),
           body: item.title,
           year: item.priorDate!.year,
           month: item.priorDate!.month,

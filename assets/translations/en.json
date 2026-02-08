@@ -2,7 +2,7 @@
   "search": "Search...",
   "create": "Create",
   "edit": "Edit",
-  "reminders": "Reminder",
+  "reminder": "Reminder",
   "error_loading_data": "Error loading data",
   "no_items_found": "No items found",
   "no_items_match_search": "No items match your search",
@@ -30,8 +30,8 @@
       "hint": "Enter the name",
       "validation": "Please enter a name"
     },
-    "date": {
-      "label": "Date",
+    "notification": {
+      "label": "Notification",
       "hint": "Select a date",
       "validation_future": "Please select a future time"
     },
@@ -43,6 +43,8 @@
       "label": "Priority"
     }
   },
+  "edit_item": "Edit Item",
+  "title": "Title",
   "confirm_deletion": "Confirm Deletion",
   "delete_item_question": "Are you sure you want to delete this item?",
   "delete_cost": "This will cost {cost} coin",
