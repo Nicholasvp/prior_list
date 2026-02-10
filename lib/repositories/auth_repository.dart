@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthRepository {
   final FirebaseAuth _firebaseAuth;
@@ -34,14 +35,13 @@ class AuthRepository {
   }
 
   Future<User?> signInWithGoogle() async {
-    try {
-      final googleProvider = GoogleAuthProvider();
-      googleProvider.addScope('email');
-      googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
-
-      final userCredential =
-          await _firebaseAuth.signInWithProvider(googleProvider);
-      return userCredential.user;
+    try{
+    final gUser = await GoogleSignIn.instance.authenticate();
+    final gAuth = await gUser.authentication;
+    final credential = GoogleAuthProvider.credential(
+      idToken: gAuth.idToken,
+    );
+    final userCredential = await _firebaseAuth.signInWithCredential(credential);
     } catch (e) {
       throw Exception('Erro ao fazer login com Google: $e');
     }
