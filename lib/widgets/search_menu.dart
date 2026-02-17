@@ -4,19 +4,85 @@ import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 
-class SearchMenu extends StatelessWidget {
+class SearchMenu extends StatefulWidget {
   final TextEditingController searchController;
   final PriorListController priorListController;
   final Function(String) onSearchChanged;
-  final VoidCallback onFilterPressed;
+  
 
   const SearchMenu({
     super.key,
     required this.searchController,
     required this.onSearchChanged,
-    required this.onFilterPressed,
+    
     required this.priorListController,
   });
+
+  @override
+  State<SearchMenu> createState() => _SearchMenuState();
+}
+
+class _SearchMenuState extends State<SearchMenu> {
+  void openSortModal() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ValueListenableBuilder<String>(
+          valueListenable: widget.priorListController.sortType,
+          builder: (context, active, child) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Data
+                    IconButton(
+                      icon: HugeIcon(
+                        icon: HugeIcons.strokeRoundedCalendar01,
+                        color: active == 'date' ? Colors.blue : Colors.black,
+                      ),
+                      onPressed: () {
+                        widget.priorListController.changeSort('date');
+                        Navigator.pop(context);
+                      },
+                    ),
+                    // Nome (alfabética)
+                    IconButton(
+                      icon: HugeIcon(
+                        icon: HugeIcons.strokeRoundedArrangeByLettersAZ,
+                        color: active == 'name' ? Colors.blue : Colors.black,
+                      ),
+                      onPressed: () {
+                        widget.priorListController.changeSort('name');
+                        Navigator.pop(context);
+                      },
+                    ),
+                    // Prioridade
+                    IconButton(
+                      icon: HugeIcon(
+                        icon: HugeIcons.strokeRoundedTemperature,
+                        color: active == 'priority'
+                            ? Colors.blue
+                            : Colors.black,
+                      ),
+                      onPressed: () {
+                        widget.priorListController.changeSort('priority');
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +92,7 @@ class SearchMenu extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
-              controller: searchController,
+              controller: widget.searchController,
               decoration: InputDecoration(
                 hintText: 'search'.tr(),
                 prefixIcon: Padding(
@@ -47,19 +113,19 @@ class SearchMenu extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onChanged: onSearchChanged,
+              onChanged: widget.onSearchChanged,
             ),
           ),
           Gap(8),
           ValueListenableBuilder<String>(
-            valueListenable: priorListController.sortType,
+            valueListenable: widget.priorListController.sortType,
             builder: (context, active, child) {
               return IconButton(
                 icon: HugeIcon(
                   icon: HugeIcons.strokeRoundedFilter,
                   color: Colors.black,
                 ),
-                onPressed: onFilterPressed,
+                onPressed: openSortModal,
               );
             },
           ),

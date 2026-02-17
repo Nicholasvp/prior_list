@@ -11,7 +11,11 @@ class ItemModel {
   final PriorType priorType;
   final String? color;
   final bool completed;
-  final DateTime? completedAt; // ← NOVO CAMPO
+  final DateTime? completedAt;
+  final String ownerId;
+  final String? teamId;
+  final DateTime? updatedAt;
+  final bool isDeleted;
 
   ItemModel({
     required this.id,
@@ -22,7 +26,11 @@ class ItemModel {
     required this.priorType,
     this.color,
     this.completed = false,
-    this.completedAt, // ← opcional
+    this.completedAt,
+    required this.ownerId,
+    this.teamId,
+    this.updatedAt,
+    this.isDeleted = false,
   });
 
   ItemModel copyWith({
@@ -34,7 +42,11 @@ class ItemModel {
     PriorType? priorType,
     String? color,
     bool? completed,
-    DateTime? completedAt, // ← adicionado
+    DateTime? completedAt,
+    String? ownerId,
+    String? teamId,
+    DateTime? updatedAt,
+    bool? isDeleted,
   }) {
     return ItemModel(
       id: id ?? this.id,
@@ -45,7 +57,11 @@ class ItemModel {
       priorType: priorType ?? this.priorType,
       color: color ?? this.color,
       completed: completed ?? this.completed,
-      completedAt: completedAt ?? this.completedAt, // ← adicionado
+      completedAt: completedAt ?? this.completedAt,
+      ownerId: ownerId ?? this.ownerId,
+      teamId: teamId ?? this.teamId,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -59,7 +75,11 @@ class ItemModel {
       'priorType': priorType.name,
       'color': color,
       'completed': completed,
-      'completedAt': completedAt?.millisecondsSinceEpoch, // ← adicionado
+      'completedAt': completedAt?.millisecondsSinceEpoch,
+      'ownerId': ownerId,
+      'teamId': teamId,
+      'updatedAt': updatedAt?.millisecondsSinceEpoch,
+      'isDeleted': isDeleted,
     };
   }
 
@@ -79,7 +99,13 @@ class ItemModel {
       completed: map['completed'] as bool? ?? false,
       completedAt: map['completedAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['completedAt'] as int)
-          : null, // ← adicionado
+          : null,
+      ownerId: map['ownerId'] as String,
+      teamId: map['teamId'] as String?,
+      updatedAt: map['updatedAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int)
+          : null,
+      isDeleted: map['isDeleted'] as bool? ?? false,
     );
   }
 
@@ -90,9 +116,8 @@ class ItemModel {
 
   @override
   String toString() {
-    return 'ItemModel(id: $id, title: $title, createdAt: $createdAt, '
-        'priorDate: $priorDate, linkUrl: $linkUrl, priorType: $priorType, '
-        'color: $color, completed: $completed, completedAt: $completedAt)';
+    return 'ItemModel(id: $id, title: $title, ownerId: $ownerId, '
+        'teamId: $teamId, completed: $completed)';
   }
 
   @override
@@ -107,7 +132,11 @@ class ItemModel {
         other.priorType == priorType &&
         other.color == color &&
         other.completed == completed &&
-        other.completedAt == completedAt; // ← adicionado
+        other.completedAt == completedAt &&
+        other.ownerId == ownerId &&
+        other.teamId == teamId &&
+        other.updatedAt == updatedAt &&
+        other.isDeleted == isDeleted;
   }
 
   @override
@@ -120,6 +149,10 @@ class ItemModel {
         priorType.hashCode ^
         color.hashCode ^
         completed.hashCode ^
-        completedAt.hashCode; // ← adicionado
+        completedAt.hashCode ^
+        ownerId.hashCode ^
+        teamId.hashCode ^
+        updatedAt.hashCode ^
+        isDeleted.hashCode;
   }
 }

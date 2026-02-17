@@ -8,11 +8,13 @@ import 'package:prior_list/controllers/state_controller.dart';
 import 'package:prior_list/enums/enums.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/models/item_model.dart';
+import 'package:prior_list/repositories/auth_repository.dart';
 import 'package:prior_list/repositories/hive_repository.dart';
 import 'package:prior_list/repositories/notification_repository.dart';
 
 class PriorListController extends StateController {
-  HiveRepository hiveRepository = HiveRepository('prior_list');
+  final hiveRepository = HiveRepository('prior_list');
+  final authRepository = autoInjector.get<AuthRepository>();
 
   final coinsController = autoInjector.get<CoinsController>();
 
@@ -32,6 +34,10 @@ class PriorListController extends StateController {
   int get totalItems => _allItems.length;
   int get completedItems => _allItems.where((item) => item.completed).length;
   int get pendingItems => _allItems.length - completedItems;
+
+  Future<void> _saveTaskstoFirebase() async {
+    
+  }
 
   Future<void> _saveListToHive() async {
     try {
@@ -185,6 +191,7 @@ class PriorListController extends StateController {
     final now = DateTime.now();
     final item = ItemModel(
       id: now.millisecondsSinceEpoch.toString(),
+      ownerId: authRepository.currentUser?.uid ?? 'unknown',
       title: nomeController.text,
       createdAt: now,
       priorDate: dateController.text.isNotEmpty

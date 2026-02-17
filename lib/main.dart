@@ -1,7 +1,6 @@
 import 'package:auto_injector/auto_injector.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive/hive.dart';
@@ -11,6 +10,8 @@ import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/home_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/firebase_options.dart';
+import 'package:prior_list/repositories/auth_repository.dart';
+import 'package:prior_list/repositories/database_repository.dart';
 import 'package:prior_list/repositories/notification_repository.dart';
 import 'package:prior_list/theme/theme_app.dart';
 import 'package:prior_list/views/home/home_page.dart';
@@ -31,6 +32,8 @@ Future<void> main() async {
   autoInjector.addSingleton(HomeController.new);
   autoInjector.addSingleton(AdMobController.new);
   autoInjector.addSingleton(CoinsController.new);
+  autoInjector.addSingleton(AuthRepository.new);
+  autoInjector.addSingleton(DatabaseRepository.new);
   autoInjector.commit();
 
   NotificationRepository().initialize();
@@ -53,7 +56,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.setLocale(Locale('pt'));
     return MaterialApp(
       title: 'Prior List',
       supportedLocales: context.supportedLocales,

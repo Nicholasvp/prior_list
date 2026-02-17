@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -13,6 +12,7 @@ import 'package:prior_list/widgets/app_drawer.dart';
 import 'package:prior_list/widgets/choice_filter_menu.dart';
 import 'package:prior_list/widgets/menu_coins.dart';
 import 'package:prior_list/widgets/search_menu.dart';
+import 'package:prior_list/widgets/teams_menu.dart';
 
 class PriorListPage extends StatefulWidget {
   const PriorListPage({super.key});
@@ -37,67 +37,6 @@ class _PriorListPageState extends State<PriorListPage> {
     super.didChangeDependencies();
   }
 
-  void openSortModal() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ValueListenableBuilder<String>(
-          valueListenable: priorListController.sortType,
-          builder: (context, active, child) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // Data
-                    IconButton(
-                      icon: HugeIcon(
-                        icon: HugeIcons.strokeRoundedCalendar01,
-                        color: active == 'date' ? Colors.blue : Colors.black,
-                      ),
-                      onPressed: () {
-                        priorListController.changeSort('date');
-                        Navigator.pop(context);
-                      },
-                    ),
-                    // Nome (alfabética)
-                    IconButton(
-                      icon: HugeIcon(
-                        icon: HugeIcons.strokeRoundedArrangeByLettersAZ,
-                        color: active == 'name' ? Colors.blue : Colors.black,
-                      ),
-                      onPressed: () {
-                        priorListController.changeSort('name');
-                        Navigator.pop(context);
-                      },
-                    ),
-                    // Prioridade
-                    IconButton(
-                      icon: HugeIcon(
-                        icon: HugeIcons.strokeRoundedTemperature,
-                        color: active == 'priority'
-                            ? Colors.blue
-                            : Colors.black,
-                      ),
-                      onPressed: () {
-                        priorListController.changeSort('priority');
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   @override
   void dispose() {
     searchController.dispose();
@@ -108,7 +47,7 @@ class _PriorListPageState extends State<PriorListPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        endDrawer:  AppDrawer(),
+        endDrawer: AppDrawer(),
         body: Column(
           children: [
             Row(
@@ -123,7 +62,7 @@ class _PriorListPageState extends State<PriorListPage> {
                     return DrawerButton(
                       onPressed: () => Scaffold.of(context).openEndDrawer(),
                     );
-                  }
+                  },
                 ),
               ],
             ),
@@ -134,8 +73,10 @@ class _PriorListPageState extends State<PriorListPage> {
                 setState(() => query = val);
                 priorListController.search(query);
               },
-              onFilterPressed: openSortModal,
             ),
+
+            Gap(8),
+            TeamsMenu(),
             Gap(8),
             ChoiceFilterMenu(),
             Expanded(
@@ -164,7 +105,3 @@ class _PriorListPageState extends State<PriorListPage> {
     );
   }
 }
-
-
-
-

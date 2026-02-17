@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:prior_list/main.dart';
+import 'package:prior_list/repositories/database_repository.dart';
 
 class AuthRepository {
   final FirebaseAuth _firebaseAuth;
@@ -7,8 +9,10 @@ class AuthRepository {
   AuthRepository({FirebaseAuth? firebaseAuth})
       : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
-  // Getter para escutar mudanças no estado de autenticação
+  
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+
+  final databaseRepository = autoInjector.get<DatabaseRepository>();
 
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     try {
@@ -28,7 +32,16 @@ class AuthRepository {
         email: email,
         password: password,
       );
-      return userCredential.user;
+
+      final user = userCredential.user;
+      if (user != null) {
+        await databaseRepository.createUser(
+          userId: user.uid,
+          name: user.displayName ?? 'Usuário',
+          email: user.email ?? email,
+        );
+      }
+      return user;
     } catch (e) {
       throw Exception('Erro ao registrar usuário: $e');
     }
@@ -37,11 +50,20 @@ class AuthRepository {
   Future<User?> signInWithGoogle() async {
     try{
     final gUser = await GoogleSignIn.instance.authenticate();
-    final gAuth = await gUser.authentication;
+    final gAuth =  gUser.authentication;
     final credential = GoogleAuthProvider.credential(
       idToken: gAuth.idToken,
     );
     final userCredential = await _firebaseAuth.signInWithCredential(credential);
+    final user = userCredential.user;
+      if (user != null) {
+        await databaseRepository.createUser(
+          userId: user.uid,
+          name: user.displayName ?? 'Usuário',
+          email: user.email ?? gUser.email,
+        );
+      }
+    return user;
     } catch (e) {
       throw Exception('Erro ao fazer login com Google: $e');
     }
