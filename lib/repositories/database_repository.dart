@@ -37,13 +37,24 @@ class DatabaseRepository {
   // 📝 TASKS
   // =====================================================
 
-  Future<void> createTask(ItemModel item) async {
-    await _tasksRef.doc(item.id).set(item.toMap());
-  }
+Future<void> createTask(ItemModel item) async {
+  final now = DateTime.now().millisecondsSinceEpoch;
+
+  await _tasksRef.doc(item.id).set({
+    ...item.toMap(),
+    'isDeleted': false,
+    'createdAt': item.createdAt,
+    'updatedAt': now,
+    'teamId': item.teamId,
+  });
+}
 
   Future<void> updateTask(ItemModel item) async {
-    await _tasksRef.doc(item.id).update(item.toMap());
-  }
+  await _tasksRef.doc(item.id).update({
+    ...item.toMap(),
+    'updatedAt': DateTime.now().millisecondsSinceEpoch,
+  });
+}
 
   Future<void> deleteTask(String taskId) async {
     await _tasksRef.doc(taskId).update({
@@ -62,27 +73,23 @@ class DatabaseRepository {
   // 🔄 STREAMS (PERFEITO PARA VALUE NOTIFIER)
   // =====================================================
 
-  Stream<List<ItemModel>> streamMyTasks(String userId) {
-    return _tasksRef
-        .where('ownerId', isEqualTo: userId)
+  Stream<List<ItemModel>> streamTasks(String userId, {String? teamId}) {
+  Query query = _tasksRef.where('isDeleted', isEqualTo: false);
+
+  // Tarefas do usuário
+  query = query.where('ownerId', isEqualTo: userId);
+
+  // Se quiser incluir tarefas do time, faz um where para teamId
+  if (teamId != null) {
+    query = _tasksRef
         .where('isDeleted', isEqualTo: false)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) =>
-                ItemModel.fromMap(doc.data() as Map<String, dynamic>))
-            .toList());
+        .where('teamId', isEqualTo: teamId);
   }
 
-  Stream<List<ItemModel>> streamSharedTasks(String userId) {
-    return _tasksRef
-        .where('sharedWith', arrayContains: userId)
-        .where('isDeleted', isEqualTo: false)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) =>
-                ItemModel.fromMap(doc.data() as Map<String, dynamic>))
-            .toList());
-  }
+  return query.snapshots().map((snapshot) => snapshot.docs
+      .map((doc) => ItemModel.fromMap(doc.data() as Map<String, dynamic>))
+      .toList());
+}
 
   // =====================================================
   // 🤝 SHARE
@@ -107,4 +114,10 @@ class DatabaseRepository {
       'updatedAt': DateTime.now().millisecondsSinceEpoch,
     });
   }
+
+  String generateTaskId() {
+    return _tasksRef.doc().id;
+  }
+
+
 }

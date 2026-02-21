@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:prior_list/controllers/ad_mob_controller.dart';
 import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/home_controller.dart';
+import 'package:prior_list/controllers/navigation_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/firebase_options.dart';
 import 'package:prior_list/repositories/auth_repository.dart';
@@ -28,6 +29,7 @@ Future<void> main() async {
   final dir = await getApplicationDocumentsDirectory();
   Hive.init(dir.path);
 
+  autoInjector.addSingleton(NavigationController.new);
   autoInjector.addSingleton(PriorListController.new);
   autoInjector.addSingleton(HomeController.new);
   autoInjector.addSingleton(AdMobController.new);

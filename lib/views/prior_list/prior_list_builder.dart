@@ -20,6 +20,7 @@ class PriorListBuilder extends StatelessWidget {
     final priorListController = autoInjector.get<PriorListController>();
 
     return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 80.0),
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];

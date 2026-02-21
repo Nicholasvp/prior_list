@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:prior_list/enums/enums.dart';
 
 class ItemModel {
@@ -85,28 +86,36 @@ class ItemModel {
 
   factory ItemModel.fromMap(Map<String, dynamic> map) {
     return ItemModel(
-      id: map['id'] as String,
-      title: map['title'] as String,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
-      priorDate: map['priorDate'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['priorDate'] as int)
-          : null,
-      linkUrl: map['linkUrl'] as String?,
-      priorType: map['priorType'] != null
-          ? transformToPriotType[map['priorType']]!
-          : PriorType.low,
-      color: map['color'] as String?,
-      completed: map['completed'] as bool? ?? false,
-      completedAt: map['completedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['completedAt'] as int)
-          : null,
-      ownerId: map['ownerId'] as String,
-      teamId: map['teamId'] as String?,
-      updatedAt: map['updatedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int)
-          : null,
-      isDeleted: map['isDeleted'] as bool? ?? false,
-    );
+  id: map['id'] as String,
+  title: map['title'] as String,
+  createdAt: (map['createdAt'] is Timestamp
+      ? (map['createdAt'] as Timestamp).toDate()
+      : DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int)),
+  priorDate: map['priorDate'] != null
+      ? (map['priorDate'] is Timestamp
+          ? (map['priorDate'] as Timestamp).toDate()
+          : DateTime.fromMillisecondsSinceEpoch(map['priorDate'] as int))
+      : null,
+  linkUrl: map['linkUrl'] as String?,
+  priorType: map['priorType'] != null
+      ? transformToPriotType[map['priorType']]!
+      : PriorType.low,
+  color: map['color'] as String?,
+  completed: map['completed'] as bool? ?? false,
+  completedAt: map['completedAt'] != null
+      ? (map['completedAt'] is Timestamp
+          ? (map['completedAt'] as Timestamp).toDate()
+          : DateTime.fromMillisecondsSinceEpoch(map['completedAt'] as int))
+      : null,
+  ownerId: map['ownerId'] as String,
+  teamId: map['teamId'] as String?,
+  updatedAt: map['updatedAt'] != null
+      ? (map['updatedAt'] is Timestamp
+          ? (map['updatedAt'] as Timestamp).toDate()
+          : DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int))
+      : null,
+  isDeleted: map['isDeleted'] as bool? ?? false,
+);
   }
 
   String toJson() => json.encode(toMap());
