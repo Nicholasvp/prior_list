@@ -57,6 +57,7 @@ class PriorListController extends StateController {
   // =============================
 
   void applyFiltersAndSort() {
+    loading();
     List<ItemModel> result = List<ItemModel>.from(_allItems);
 
     switch (statusFilter.value) {
@@ -84,7 +85,9 @@ class PriorListController extends StateController {
         break;
     }
 
-    items.value = result;
+    items.value = result; 
+
+    completed();
   }
 
   void changeStatus(String newStatus) {
@@ -102,7 +105,7 @@ class PriorListController extends StateController {
   // =============================
 
   Future<void> addItem({String? teamId}) async {
-    if (!coinsController.spentToCreate()) return;
+    if (!await coinsController.spentToCreate()) return;
 
     loading();
 
@@ -150,7 +153,7 @@ class PriorListController extends StateController {
   // =============================
 
   Future<void> editItem(ItemModel originalItem) async {
-    if (!coinsController.spentToEdit()) return;
+    if (!await coinsController.spentToEdit()) return;
 
     loading();
 
@@ -208,7 +211,7 @@ class PriorListController extends StateController {
   // =============================
 
   Future<void> deleteItem(String id) async {
-    if (!coinsController.spentToRemove()) return;
+    if (!await coinsController.spentToRemove()) return;
     await databaseRepository.deleteTask(id);
   }
 

@@ -29,13 +29,13 @@ Future<void> main() async {
   final dir = await getApplicationDocumentsDirectory();
   Hive.init(dir.path);
 
-  autoInjector.addSingleton(NavigationController.new);
-  autoInjector.addSingleton(PriorListController.new);
-  autoInjector.addSingleton(HomeController.new);
-  autoInjector.addSingleton(AdMobController.new);
-  autoInjector.addSingleton(CoinsController.new);
   autoInjector.addSingleton(AuthRepository.new);
   autoInjector.addSingleton(DatabaseRepository.new);
+  autoInjector.addSingleton(NavigationController.new);
+  autoInjector.addSingleton(CoinsController.new);
+  autoInjector.addSingleton(HomeController.new);
+  autoInjector.addSingleton(AdMobController.new);
+  autoInjector.addSingleton(PriorListController.new);
   autoInjector.commit();
 
   NotificationRepository().initialize();

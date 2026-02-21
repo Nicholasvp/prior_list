@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:prior_list/models/user_model.dart';
 import '../models/item_model.dart';
 
 class DatabaseRepository {
@@ -15,23 +16,28 @@ class DatabaseRepository {
   // 👤 USERS
   // =====================================================
 
-  Future<void> createUser({
-    required String userId,
-    required String name,
-    required String email,
-  }) async {
-    await _usersRef.doc(userId).set({
-      'id': userId,
-      'name': name,
-      'email': email,
-      'createdAt': DateTime.now().millisecondsSinceEpoch,
-    });
+Future<void> createUser(UserModel user) async {
+  await _usersRef.doc(user.id).set(user.toJson()..addAll({
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+      }));
+}
+
+  Future<UserModel?> getUser(String userId) async {
+    final doc = await _usersRef.doc(userId).get();
+    return UserModel.fromJson(doc.data() as Map<String, dynamic>);
   }
 
-  Future<Map<String, dynamic>?> getUser(String userId) async {
-    final doc = await _usersRef.doc(userId).get();
-    return doc.data() as Map<String, dynamic>?;
-  }
+  // 🔹 USERS - Coins
+Future<int> getUserCoins(String userId) async {
+  final doc = await _usersRef.doc(userId).get();
+  if (!doc.exists) return 0;
+  final data = doc.data() as Map<String, dynamic>;
+  return data['coins'] != null ? data['coins'] as int : 0;
+}
+
+Future<void> updateUserCoins(String userId, int coins) async {
+  await _usersRef.doc(userId).update({'coins': coins});
+}
 
   // =====================================================
   // 📝 TASKS

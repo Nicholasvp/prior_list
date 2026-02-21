@@ -1,51 +1,60 @@
 import 'package:flutter/foundation.dart';
-import 'package:prior_list/repositories/hive_repository.dart';
+import 'package:prior_list/repositories/auth_repository.dart';
+import 'package:prior_list/repositories/database_repository.dart';
 
 class CoinsController {
-  ValueNotifier<int> coins = ValueNotifier<int>(0);
+  final DatabaseRepository databaseRepository;
+  final AuthRepository authRepository;
 
-  HiveRepository hiveRepository = HiveRepository('coins');
+  ValueNotifier<int> coins = ValueNotifier<int>(0);
 
   int costToAddItem = 3;
   int costToRemoveItem = 1;
   int costToEditItem = 2;
-  
   int reward = 10;
+
+  CoinsController({
+    required this.databaseRepository,
+    required this.authRepository,
+  });
+
+  String get userId => authRepository.currentUser!.uid; // pega direto do AuthRepository
 
   bool get hasEnoughToAddItem => coins.value >= costToAddItem;
   bool get hasEnoughToRemoveItem => coins.value >= costToRemoveItem;
   bool get hasEnoughToEditItem => coins.value >= costToEditItem;
 
-  void fetchCoins() async {
-    coins.value = await hiveRepository.read('coins') ?? 0;
+  Future<void> fetchCoins() async {
+    coins.value = await databaseRepository.getUserCoins(userId);
   }
-  void addCoins(int value) {
-    hiveRepository.create('coins', coins.value + value);
-    fetchCoins();
+
+  Future<void> addCoins(int value) async {
+    final newCoins = coins.value + value;
+    await databaseRepository.updateUserCoins(userId, newCoins);
+    coins.value = newCoins;
   }
-  bool spentToCreate() {
-    if(coins.value < costToAddItem) {
-      return false;
-    }
-    hiveRepository.create('coins', coins.value - costToAddItem);
-    fetchCoins();
+
+  Future<bool> spentToCreate() async {
+    if (coins.value < costToAddItem) return false;
+    final newCoins = coins.value - costToAddItem;
+    await databaseRepository.updateUserCoins(userId, newCoins);
+    coins.value = newCoins;
     return true;
   }
-  bool spentToRemove() {
-    if(coins.value < costToRemoveItem) {
-      return false;
-    }
-    hiveRepository.create('coins', coins.value - costToRemoveItem);
-    fetchCoins();
+
+  Future<bool> spentToRemove() async {
+    if (coins.value < costToRemoveItem) return false;
+    final newCoins = coins.value - costToRemoveItem;
+    await databaseRepository.updateUserCoins(userId, newCoins);
+    coins.value = newCoins;
     return true;
   }
-  bool spentToEdit() {
-    if(coins.value < costToEditItem) {
-      return false;
-    }
-    hiveRepository.create('coins', coins.value - costToEditItem);
-    fetchCoins();
+
+  Future<bool> spentToEdit() async {
+    if (coins.value < costToEditItem) return false;
+    final newCoins = coins.value - costToEditItem;
+    await databaseRepository.updateUserCoins(userId, newCoins);
+    coins.value = newCoins;
     return true;
   }
-  
 }

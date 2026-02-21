@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:prior_list/main.dart';
+import 'package:prior_list/models/user_model.dart';
 import 'package:prior_list/repositories/database_repository.dart';
 
 class AuthRepository {
@@ -36,9 +37,7 @@ class AuthRepository {
       final user = userCredential.user;
       if (user != null) {
         await databaseRepository.createUser(
-          userId: user.uid,
-          name: user.displayName ?? 'Usuário',
-          email: user.email ?? email,
+          UserModel(id: user.uid, email: email)
         );
       }
       return user;
@@ -58,9 +57,7 @@ class AuthRepository {
     final user = userCredential.user;
       if (user != null) {
         await databaseRepository.createUser(
-          userId: user.uid,
-          name: user.displayName ?? 'Usuário',
-          email: user.email ?? gUser.email,
+          UserModel(id: user.uid, name: user.displayName!, email: user.email!,)
         );
       }
     return user;
