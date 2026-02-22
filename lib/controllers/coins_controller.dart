@@ -18,7 +18,7 @@ class CoinsController {
     required this.authRepository,
   });
 
-  String get userId => authRepository.currentUser!.uid; // pega direto do AuthRepository
+  String get userId => authRepository.currentUser!.uid;
 
   bool get hasEnoughToAddItem => coins.value >= costToAddItem;
   bool get hasEnoughToRemoveItem => coins.value >= costToRemoveItem;

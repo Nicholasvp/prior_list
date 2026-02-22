@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:prior_list/controllers/home_controller.dart';
@@ -5,6 +6,7 @@ import 'package:prior_list/controllers/navigation_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/views/prior_list/prior_list_page.dart';
+import 'package:prior_list/views/teams/team_page.dart';
 import 'package:prior_list/widgets/buttom_sheet_item_form.dart';
 
 class HomePage extends StatelessWidget {
@@ -49,18 +51,14 @@ class HomePage extends StatelessWidget {
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: index,
             onTap: navigationController.changeTab,
-            items: const [
+            items:  [
               BottomNavigationBarItem(
-                icon: Icon(Icons.checklist),
-                label: 'Tarefas',
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedTask01, color: Colors.black),
+                label: 'tasks'.tr(),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.groups),
-                label: 'Time',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Perfil',
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedUserGroup, color: Colors.black),
+                label: 'teams'.tr(),
               ),
             ],
           ),
@@ -82,6 +80,5 @@ class HomePage extends StatelessWidget {
 
 final List<Widget> _pages = [
   const PriorListPage(),
-  const Center(child: Text('Time Page')),
-  const Center(child: Text('Perfil Page')),
+  const TeamPage(),
 ];

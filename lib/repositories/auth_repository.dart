@@ -15,6 +15,10 @@ class AuthRepository {
 
   final databaseRepository = autoInjector.get<DatabaseRepository>();
 
+  bool get isLoggedIn => _firebaseAuth.currentUser != null;
+
+  User? get currentUser => _firebaseAuth.currentUser;
+
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     try {
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
@@ -74,5 +78,4 @@ class AuthRepository {
     }
   }
 
-  User? get currentUser => _firebaseAuth.currentUser;
 }
