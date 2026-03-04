@@ -16,19 +16,23 @@ class TeamController {
   String get _userId => _authRepository.currentUser!.uid;
 
   /// ================= CREATE =================
-  Future<void> createTeam(TeamModel team) async {
-    _setLoading(true);
-    _clearError();
+Future<void> createTeam(TeamModel team) async {
+  _setLoading(true);
+  _clearError();
 
-    try {
-      final teamWithOwner = team.copyWith(ownerId: _userId);
-      await _repository.createTeam(teamWithOwner);
-    } catch (e) {
-      errorMessage.value = e.toString();
-    } finally {
-      _setLoading(false);
-    }
+  try {
+    final teamWithOwner = team.copyWith(
+      ownerId: _userId,
+      members: [...team.members, _userId], // 🔥 adiciona criador
+    );
+
+    await _repository.createTeam(teamWithOwner);
+  } catch (e) {
+    errorMessage.value = e.toString();
+  } finally {
+    _setLoading(false);
   }
+}
 
   /// ================= FETCH =================
   Future<void> fetchTeams() async {
@@ -79,6 +83,33 @@ class TeamController {
       _setLoading(false);
     }
   }
+  // ================== ADD MEMBER =================
+  Future<void> addMember(String teamId, String userId) async {
+  _setLoading(true);
+  _clearError();
+
+  try {
+    await _repository.addMember(teamId, userId);
+  } catch (e) {
+    errorMessage.value = e.toString();
+  } finally {
+    _setLoading(false);
+  }
+}
+
+// ================== REMOVE MEMBER =================
+Future<void> removeMember(String teamId, String userId) async {
+  _setLoading(true);
+  _clearError();
+
+  try {
+    await _repository.removeMember(teamId, userId);
+  } catch (e) {
+    errorMessage.value = e.toString();
+  } finally {
+    _setLoading(false);
+  }
+}
 
   /// ================= HELPERS =================
   void _setLoading(bool value) => isLoading.value = value;

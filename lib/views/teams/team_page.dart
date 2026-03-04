@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:prior_list/controllers/team_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/models/team_model.dart';
+import 'package:prior_list/widgets/team_card.dart';
+import 'package:prior_list/widgets/team_form_widget.dart';
 
 class TeamPage extends StatefulWidget {
   const TeamPage({super.key});
@@ -13,91 +15,133 @@ class TeamPage extends StatefulWidget {
 class _TeamPageState extends State<TeamPage> {
   final TeamController controller = autoInjector.get<TeamController>();
 
-  final _nameController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
+
+    /// 🔥 FETCH inicial
+    // controller.fetchTeams();
+
+    /// Se quiser usar stream ao invés de fetch:
     controller.listenTeams();
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
+  void _openForm({TeamModel? team}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => TeamFormWidget(
+        team: team,
+        onSubmit: (teamModel) async {
+          if (team == null) {
+            await controller.createTeam(teamModel);
+          } else {
+            await controller.updateTeam(teamModel);
+          }
+        },
+      ),
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Teams')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            /// CREATE TEAM
-            Row(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Team name',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    controller.createTeam(
-                      TeamModel(
-                        id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        name: _nameController.text.trim(),
-                        ownerId: '', // será sobrescrito no controller
-                        createdAt: DateTime.now(),
-                        members: [],
+                /// ================= ERROR =================
+                ValueListenableBuilder<String?>(
+                  valueListenable: controller.errorMessage,
+                  builder: (_, error, __) {
+                    if (error == null) return const SizedBox();
+
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        error,
+                        style: const TextStyle(color: Colors.red),
                       ),
                     );
                   },
-                  child: const Text('Create'),
+                ),
+
+                /// ================= LIST =================
+                Expanded(
+                  child: ValueListenableBuilder<List<TeamModel>>(
+                    valueListenable: controller.teams,
+                    builder: (_, teams, __) {
+                      if (teams.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No teams yet',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        itemCount: teams.length,
+                        itemBuilder: (_, index) {
+                          final team = teams[index];
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: TeamCard(
+                              team: team,
+                              onEdit: () => _openForm(team: team),
+                              onDelete: () =>
+                                  controller.deleteTeam(team.id),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+
+                /// ================= CREATE BUTTON =================
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.add),
+                    label: const Text(
+                      'Create New Team',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    onPressed: () => _openForm(),
+                  ),
                 ),
               ],
             ),
+          ),
 
-            const SizedBox(height: 16),
+          /// ================= LOADING OVERLAY =================
+          ValueListenableBuilder<bool>(
+            valueListenable: controller.isLoading,
+            builder: (_, isLoading, __) {
+              if (!isLoading) return const SizedBox();
 
-            /// LIST
-            Expanded(
-              child: ValueListenableBuilder(
-                valueListenable: controller.teams,
-                builder: (_, teams, __) {
-                  if (teams.isEmpty) {
-                    return const Center(child: Text('No teams yet'));
-                  }
-
-                  return ListView.builder(
-                    itemCount: teams.length,
-                    itemBuilder: (_, index) {
-                      final team = teams[index];
-
-                      return Card(
-                        child: ListTile(
-                          title: Text(team.name),
-                          subtitle: Text(team.id),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => controller.deleteTeam(team.id),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+              return Container(
+                color: Colors.black.withOpacity(0.2),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
