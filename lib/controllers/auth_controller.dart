@@ -40,8 +40,8 @@ class AuthController {
     }
   }
 
-  Future<void> register() async {
-    if (!formKey.currentState!.validate()) return;
+  Future<bool> register() async {
+    if (!formKey.currentState!.validate()) return false;
 
     _setLoading(true);
     _clearError();
@@ -53,8 +53,10 @@ class AuthController {
       );
 
       user.value = result;
+      return true;
     } catch (e) {
       errorMessage.value = e.toString();
+      return false;
     } finally {
       _setLoading(false);
     }

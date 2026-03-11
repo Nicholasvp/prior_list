@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:prior_list/controllers/auth_controller.dart';
 import 'package:prior_list/controllers/team_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/models/team_model.dart';
+import 'package:prior_list/repositories/auth_repository.dart';
 import 'package:prior_list/widgets/team_card.dart';
 import 'package:prior_list/widgets/team_form_widget.dart';
 
@@ -14,6 +16,7 @@ class TeamPage extends StatefulWidget {
 
 class _TeamPageState extends State<TeamPage> {
   final TeamController controller = autoInjector.get<TeamController>();
+  final _authRepository = autoInjector.get<AuthRepository>();
 
   @override
   void initState() {
@@ -43,6 +46,57 @@ class _TeamPageState extends State<TeamPage> {
     );
   }
 
+  void _openJoinTeamForm() {
+    final TextEditingController teamIdController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Entrar em um Time"),
+          content: TextField(
+            controller: teamIdController,
+            decoration: InputDecoration(
+              labelText: "ID do Time",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Fecha o diálogo
+              },
+              child: Text("Cancelar"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final teamId = teamIdController.text.trim();
+                if (teamId.isNotEmpty) {
+                  try {
+                    await controller.addMember(
+                      teamId: teamId,
+                    ); // Chama o método addMember
+                    Navigator.pop(context); // Fecha o diálogo
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Você entrou no time com sucesso!"),
+                      ),
+                    );
+                  } catch (e) {
+                    // Mostra erro caso não consiga entrar no time
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Erro ao entrar no time: $e")),
+                    );
+                  }
+                }
+              },
+              child: Text("Entrar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,8 +154,7 @@ class _TeamPageState extends State<TeamPage> {
                             child: TeamCard(
                               team: team,
                               onEdit: () => _openForm(team: team),
-                              onDelete: () =>
-                                  controller.deleteTeam(team.id),
+                              onDelete: () => team.ownerId == _authRepository.currentUser?.uid ? controller.deleteTeam(team.id) : null,
                             ),
                           );
                         },
@@ -111,17 +164,19 @@ class _TeamPageState extends State<TeamPage> {
                 ),
 
                 /// ================= CREATE BUTTON =================
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.add),
-                    label: const Text(
-                      'Create New Team',
-                      style: TextStyle(fontSize: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => _openForm(),
+                      child: Text("Criar Time"),
                     ),
-                    onPressed: () => _openForm(),
-                  ),
+                    ElevatedButton(
+                      onPressed:
+                          _openJoinTeamForm, // Abre o formulário para inserir o ID do time
+                      child: Text("Entrar em Time"),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -135,9 +190,7 @@ class _TeamPageState extends State<TeamPage> {
 
               return Container(
                 color: Colors.black.withOpacity(0.2),
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                child: const Center(child: CircularProgressIndicator()),
               );
             },
           ),

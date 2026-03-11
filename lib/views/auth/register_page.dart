@@ -22,8 +22,9 @@ class _RegisterPageState extends State<RegisterPage> {
     controller.errorMessage.addListener(() {
       final error = controller.errorMessage.value;
       if (error != null && mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error)));
       }
     });
   }
@@ -91,12 +92,21 @@ class _RegisterPageState extends State<RegisterPage> {
                     return SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: loading ? null : controller.register,
+                        onPressed: loading
+                            ? null
+                            : () async {
+                                final success = await controller.register();
+                                if (success && context.mounted) {
+                                  context.go('/home');
+                                }
+                              },
                         child: loading
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : const Text('Criar conta'),
                       ),

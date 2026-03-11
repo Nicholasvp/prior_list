@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:prior_list/controllers/ad_mob_controller.dart';
 import 'package:prior_list/controllers/coins_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
+import 'package:prior_list/controllers/team_controller.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/views/prior_list/prior_list_builder.dart';
 import 'package:prior_list/widgets/app_drawer.dart';
@@ -24,6 +25,7 @@ class _PriorListPageState extends State<PriorListPage> {
   final priorListController = autoInjector.get<PriorListController>();
   final adMobController = autoInjector.get<AdMobController>();
   final coinsController = autoInjector.get<CoinsController>();
+  final teamController = autoInjector.get<TeamController>();
 
   @override
   void initState() {
@@ -32,8 +34,8 @@ class _PriorListPageState extends State<PriorListPage> {
     coinsController.fetchCoins();
     adMobController.loadRewardedAd();
 
-    // 🔥 agora usa stream do Firebase
     priorListController.listenTasks();
+    teamController.fetchTeams();
 
     priorListController.changeStatus('pending');
   }

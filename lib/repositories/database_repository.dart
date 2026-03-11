@@ -79,18 +79,12 @@ Future<void> createTask(ItemModel item) async {
   // 🔄 STREAMS (PERFEITO PARA VALUE NOTIFIER)
   // =====================================================
 
-  Stream<List<ItemModel>> streamTasks(String userId, {String? teamId}) {
-  Query query = _tasksRef.where('isDeleted', isEqualTo: false);
+Stream<List<ItemModel>> streamTasks(UserModel user) {
+  // Verifica se user.teams é nulo e substitui por uma lista vazia
+  final teams = user.teams ?? [];
 
-  // Tarefas do usuário
-  query = query.where('ownerId', isEqualTo: userId);
-
-  // Se quiser incluir tarefas do time, faz um where para teamId
-  if (teamId != null) {
-    query = _tasksRef
-        .where('isDeleted', isEqualTo: false)
-        .where('teamId', isEqualTo: teamId);
-  }
+  // Faz a consulta com whereIn, garantindo que teams seja uma lista válida
+  final query = _tasksRef.where("teamId", whereIn: teams);
 
   return query.snapshots().map((snapshot) => snapshot.docs
       .map((doc) => ItemModel.fromMap(doc.data() as Map<String, dynamic>))

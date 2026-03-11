@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:prior_list/models/team_model.dart';
+import 'package:random_string/random_string.dart';
 
 class TeamFormWidget extends StatefulWidget {
   final TeamModel? team;
@@ -38,8 +39,7 @@ class _TeamFormWidgetState extends State<TeamFormWidget> {
     if (!_formKey.currentState!.validate()) return;
 
     final team = TeamModel(
-      id: widget.team?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
+      id: widget.team?.id ?? randomAlpha(6).toUpperCase(),
       name: _nameController.text.trim(),
       ownerId: widget.team?.ownerId ?? '',
       createdAt: widget.team?.createdAt ?? DateTime.now(),

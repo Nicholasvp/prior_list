@@ -20,6 +20,7 @@ class PriorListController extends StateController {
   final nomeController = TextEditingController();
   final dateController = TextEditingController();
   final linkUrlController = TextEditingController();
+  final teamIdController = TextEditingController();
   final priorityForm = ValueNotifier<String>('low');
   final selectedColor = ValueNotifier<String?>(null);
 
@@ -37,18 +38,26 @@ class PriorListController extends StateController {
   // =============================
   Stream<List<ItemModel>>? _tasksStream;
 
-  void listenTasks() {
+  void listenTasks() async {
     final userId = authRepository.currentUser?.uid;
     if (userId == null) return;
 
-    loading();
+    final user = await databaseRepository.getUser(userId);
+    if (user == null) return;
 
-    _tasksStream = databaseRepository.streamTasks(userId);
+
+    _tasksStream = databaseRepository.streamTasks(user);
 
     _tasksStream!.listen((list) {
       _allItems = list;
+
+      if (list.isEmpty) {
+        items.value = [];
+        empty();
+        return;
+      }
+
       applyFiltersAndSort();
-      completed();
     });
   }
 
@@ -85,7 +94,7 @@ class PriorListController extends StateController {
         break;
     }
 
-    items.value = result; 
+    items.value = result;
 
     completed();
   }
@@ -104,7 +113,7 @@ class PriorListController extends StateController {
   // ➕ ADD
   // =============================
 
-  Future<void> addItem({String? teamId}) async {
+  Future<void> addItem() async {
     if (!await coinsController.spentToCreate()) return;
 
     loading();
@@ -114,7 +123,7 @@ class PriorListController extends StateController {
     final item = ItemModel(
       id: databaseRepository.generateTaskId(),
       ownerId: authRepository.currentUser!.uid,
-      teamId: teamId,
+      teamId: teamIdController.text.isNotEmpty ? teamIdController.text : null,
       title: nomeController.text,
       createdAt: now,
       priorDate: dateController.text.isNotEmpty
@@ -166,6 +175,7 @@ class PriorListController extends StateController {
         linkUrl: linkUrlController.text,
         priorType: transformToPriotType[priorityForm.value] ?? PriorType.low,
         color: selectedColor.value,
+        teamId: teamIdController.text.isNotEmpty ? teamIdController.text : null,
       );
 
       await databaseRepository.updateTask(updated);
@@ -235,6 +245,7 @@ class PriorListController extends StateController {
     linkUrlController.text = item.linkUrl ?? '';
     priorityForm.value = item.priorType.name;
     selectedColor.value = item.color;
+    teamIdController.text = item.teamId ?? '';
   }
 
   Future<void> search(String query) async {

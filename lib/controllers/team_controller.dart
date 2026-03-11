@@ -84,10 +84,11 @@ Future<void> createTeam(TeamModel team) async {
     }
   }
   // ================== ADD MEMBER =================
-  Future<void> addMember(String teamId, String userId) async {
+  Future<void> addMember({required String teamId, String? userId}) async {
   _setLoading(true);
   _clearError();
 
+  userId ??= _userId;
   try {
     await _repository.addMember(teamId, userId);
   } catch (e) {

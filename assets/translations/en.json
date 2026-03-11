@@ -39,6 +39,11 @@
       "label": "Link URL",
       "hint": "Enter the link URL"
     },
+    "team": {
+      "label": "Team",
+      "hint": "Select a team",
+      "validation": "Please select a team"
+    },
     "priority": {
       "label": "Priority"
     }

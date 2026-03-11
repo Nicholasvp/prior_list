@@ -8,6 +8,9 @@ class TeamRepository {
   /// ================= CREATE =================
   Future<void> createTeam(TeamModel team) async {
     await _firestore.collection(_collection).doc(team.id).set(team.toMap());
+    await _firestore.collection('users').doc(team.ownerId).update({
+      'teams': FieldValue.arrayUnion([team.id]),
+    });
   }
 
   /// ================= READ (LIST) =================
@@ -48,12 +51,18 @@ class TeamRepository {
     await _firestore.collection(_collection).doc(teamId).update({
       'members': FieldValue.arrayUnion([userId]),
     });
+    await _firestore.collection('users').doc(userId).update({
+      'teams': FieldValue.arrayUnion([teamId]),
+    });
   }
 
   /// ================= REMOVE MEMBER =================
   Future<void> removeMember(String teamId, String userId) async {
     await _firestore.collection(_collection).doc(teamId).update({
       'members': FieldValue.arrayRemove([userId]),
+    });
+    await _firestore.collection('users').doc(userId).update({
+      'teams': FieldValue.arrayRemove([teamId]),
     });
   }
 }

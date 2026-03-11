@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:prior_list/models/team_model.dart';
 
 class TeamCard extends StatelessWidget {
   final TeamModel team;
   final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback? onDelete;
 
-  const TeamCard({super.key, 
+  const TeamCard({
+    super.key,
     required this.team,
     required this.onEdit,
-    required this.onDelete,
+    this.onDelete,
   });
 
   @override
@@ -19,33 +21,42 @@ class TeamCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         color: Colors.white,
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
         ],
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         title: Text(
           team.name,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(
-          '${team.members.length} members',
-          style: const TextStyle(color: Colors.grey),
+        subtitle: Row(
+          children: [
+            Text("Código: ${team.id}"),
+            IconButton(
+              icon: Icon(Icons.copy),
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: team.id));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Código copiado: ${team.id}")),
+                );
+              },
+            ),
+          ],
         ),
         trailing: PopupMenuButton<String>(
           onSelected: (value) {
             if (value == 'edit') onEdit();
-            if (value == 'delete') onDelete();
+            if (onDelete != null) {
+              if (value == 'delete') {
+                onDelete!();
+              }
+            }
           },
-          itemBuilder: (_) => const [
-            PopupMenuItem(value: 'edit', child: Text('Edit')),
-            PopupMenuItem(value: 'delete', child: Text('Delete')),
+          itemBuilder: (_) => [
+            const PopupMenuItem(value: 'edit', child: Text('Edit')),
+            if (onDelete != null)
+              const PopupMenuItem(value: 'delete', child: Text('Delete')),
           ],
         ),
       ),

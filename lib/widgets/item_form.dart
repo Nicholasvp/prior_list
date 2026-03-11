@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:prior_list/controllers/navigation_controller.dart';
 import 'package:prior_list/controllers/prior_list_controller.dart';
+import 'package:prior_list/controllers/team_controller.dart';
 import 'package:prior_list/enums/enums.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/widgets/color_picker_widget.dart';
+import 'package:prior_list/widgets/team_dropdown.dart';
 import 'package:prior_list/widgets/text_form_primary.dart';
 
 class ItemForm extends StatelessWidget {
@@ -26,6 +29,8 @@ class ItemForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final priorListController = autoInjector.get<PriorListController>();
+    final teamController = autoInjector.get<TeamController>();
+    final navigationController = autoInjector.get<NavigationController>();
     final formKey = GlobalKey<FormState>();
 
     return Form(
@@ -124,6 +129,16 @@ class ItemForm extends StatelessWidget {
             label: 'form.link.label'.tr(),
             hintText: 'form.link.hint'.tr(),
             controller: priorListController.linkUrlController,
+          ),
+
+          const Gap(10),
+
+          // TIME
+          TeamDropdown(
+            controller: priorListController.teamIdController,
+            teams: teamController.teams.value,
+            hint: 'form.team.label'.tr(),
+            onCreateTeam: () => navigationController.changeTab(1),
           ),
 
           const Gap(15),
