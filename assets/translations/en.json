@@ -12,17 +12,14 @@
     "medium": "Medium",
     "low": "Low"
   },
-  
   "item": {
     "due_date": "Due: {date}",
     "no_due_date": "No due date"
   },
-  
   "actions": {
     "open_link": "Open Link",
     "delete": "Delete"
   },
-  
   "form": {
     "title": "Add New Item",
     "name": {
@@ -48,6 +45,34 @@
       "label": "Priority"
     }
   },
+  "language": {
+    "title": "Language",
+    "english": "English",
+    "portuguese": "Portuguese"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "email": "Email",
+    "email_hint": "Enter your email",
+    "password": "Password",
+    "password_hint": "Enter your password",
+    "confirm_password": "Confirm password",
+    "confirm_password_hint": "Confirm your password",
+    "forgot_password": "Forgot password?",
+    "no_account": "Don't have an account?",
+    "already_have_account": "Already have an account?",
+    "login_button": "Sign in",
+    "login_google": "Sign in with Google",
+    "register_button": "Create account",
+    "validation_email": "Please enter a valid email",
+    "validation_password": "Please enter a password",
+    "validation_confirm_password": "Passwords do not match",
+    "login_success": "Login successful",
+    "register_success": "Account created successfully",
+    "logout_success": "Logged out successfully"
+  },
   "edit_item": "Edit Item",
   "title": "Title",
   "confirm_deletion": "Confirm Deletion",
@@ -64,5 +89,21 @@
     "all": "All",
     "completed": "Completed",
     "pending": "Pending"
+  },
+  "success": "Success",
+  "error": "Error",
+  "tasks": "Tasks",
+  "teams_page": {
+    "title": "Teams",
+    "edit_team": "Edit Team",
+    "create_team": "Create Team",
+    "join_team": "Join Team",
+    "team_name": "Team Name",
+    "team_name_hint": "Enter team name",
+    "team_name_validation": "Please enter a team name",
+    "create": "Create",
+    "cancel": "Cancel",
+    "no_teams_found": "No teams found",
+    "team_code": "Team Code"
   }
 }

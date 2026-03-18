@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../repositories/auth_repository.dart';
@@ -12,13 +13,13 @@ class AppDrawer extends StatelessWidget {
     return Drawer(
       child: SafeArea(
         child: StreamBuilder<User?>(
-          stream: authRepository.authStateChanges, // Escuta mudanças no estado de autenticação
+          stream: authRepository.authStateChanges,
           builder: (context, snapshot) {
             final user = snapshot.data;
 
             return Column(
               children: [
-                // Exibe informações do usuário autenticado
+                /// USER INFO
                 if (user != null) ...[
                   ListTile(
                     leading: CircleAvatar(
@@ -26,36 +27,65 @@ class AppDrawer extends StatelessWidget {
                           ? NetworkImage(user.photoURL!)
                           : null,
                       child: user.photoURL == null
-                          ? Icon(Icons.person)
+                          ? const Icon(Icons.person)
                           : null,
                     ),
-                    title: Text(user.displayName ?? 'Usuário'),
+                    title: Text(user.displayName ?? 'User'),
                     subtitle: Text(user.email ?? ''),
                   ),
+
                   ListTile(
-                    leading: Icon(Icons.logout),
-                    title: Text('Sair'),
+                    leading: const Icon(Icons.logout),
+                    title: Text('auth.logout'.tr()),
                     onTap: () async {
-                      await authRepository.signOut(); // Realiza logout
-                      Navigator.of(context).pop(); // Fecha o Drawer
+                      await authRepository.signOut();
+                      Navigator.of(context).pop();
                     },
                   ),
                 ] else ...[
-                  // Exibe opções para login
+                  /// LOGIN GOOGLE
                   ListTile(
-                    leading: Icon(Icons.login),
-                    title: Text('Login com Google'),
+                    leading: const Icon(Icons.login),
+                    title: Text('auth.login_google'.tr()),
                     onTap: () async {
                       try {
-                        await authRepository.signInWithGoogle(); // Login com Google
+                        await authRepository.signInWithGoogle();
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Erro ao fazer login: $e')),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text('Error: $e')));
                       }
                     },
                   ),
                 ],
+
+                const Divider(),
+
+                /// LANGUAGE TITLE
+                ListTile(
+                  leading: const Icon(Icons.language),
+                  title: Text('language.title'.tr()),
+                ),
+
+                /// ENGLISH
+                ListTile(
+                  leading: const Text("🇬🇧"),
+                  title: Text('language.english'.tr()),
+                  onTap: () {
+                    context.setLocale(const Locale('en'));
+                    Navigator.pop(context);
+                  },
+                ),
+
+                /// PORTUGUESE
+                ListTile(
+                  leading: const Text("🇧🇷"),
+                  title: Text('language.portuguese'.tr()),
+                  onTap: () {
+                    context.setLocale(const Locale('pt'));
+                    Navigator.pop(context);
+                  },
+                ),
               ],
             );
           },

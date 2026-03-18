@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:prior_list/models/team_model.dart';
 import 'package:random_string/random_string.dart';
@@ -6,11 +7,7 @@ class TeamFormWidget extends StatefulWidget {
   final TeamModel? team;
   final Function(TeamModel) onSubmit;
 
-  const TeamFormWidget({
-    super.key,
-    this.team,
-    required this.onSubmit,
-  });
+  const TeamFormWidget({super.key, this.team, required this.onSubmit});
 
   @override
   State<TeamFormWidget> createState() => _TeamFormWidgetState();
@@ -68,24 +65,23 @@ class _TeamFormWidgetState extends State<TeamFormWidget> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              isEditing ? 'Edit Team' : 'Create Team',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              isEditing
+                  ? 'teams_page.edit_team'.tr()
+                  : 'teams_page.create_team'.tr(),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 16),
 
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Team name',
+              decoration: InputDecoration(
+                labelText: 'teams_page.team_name'.tr(),
                 border: OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Enter a name';
+                  return 'teams_page.team_name_validation'.tr();
                 }
                 return null;
               },
@@ -98,7 +94,11 @@ class _TeamFormWidgetState extends State<TeamFormWidget> {
               height: 50,
               child: ElevatedButton(
                 onPressed: _submit,
-                child: Text(isEditing ? 'Update' : 'Create'),
+                child: Text(
+                  isEditing
+                      ? 'teams_page.edit_team'.tr()
+                      : 'teams_page.create_team'.tr(),
+                ),
               ),
             ),
           ],

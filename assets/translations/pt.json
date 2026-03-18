@@ -12,17 +12,14 @@
     "medium": "Média",
     "low": "Baixa"
   },
-  
   "item": {
     "due_date": "Data: {date}",
     "no_due_date": "Sem data"
   },
-  
   "actions": {
     "open_link": "Abrir Link",
     "delete": "Excluir"
   },
-  
   "form": {
     "title": "Adicionar Novo Item",
     "name": {
@@ -48,6 +45,34 @@
       "label": "Prioridade"
     }
   },
+  "language": {
+    "title": "Idioma",
+    "english": "Inglês",
+    "portuguese": "Português"
+  },
+  "auth": {
+    "login": "Entrar",
+    "logout": "Sair",
+    "register": "Registrar",
+    "email": "Email",
+    "email_hint": "Digite seu email",
+    "password": "Senha",
+    "password_hint": "Digite sua senha",
+    "confirm_password": "Confirmar senha",
+    "confirm_password_hint": "Confirme sua senha",
+    "forgot_password": "Esqueceu a senha?",
+    "no_account": "Não tem uma conta?",
+    "already_have_account": "Já possui uma conta?",
+    "login_button": "Entrar",
+    "login_google": "Entrar com Google",
+    "register_button": "Criar conta",
+    "validation_email": "Digite um email válido",
+    "validation_password": "Digite uma senha",
+    "validation_confirm_password": "As senhas não coincidem",
+    "login_success": "Login realizado com sucesso",
+    "register_success": "Conta criada com sucesso",
+    "logout_success": "Logout realizado com sucesso"
+  },
   "edit_item": "Editar Item",
   "title": "Título",
   "confirm_deletion": "Confirmar Exclusão",
@@ -64,5 +89,21 @@
     "all": "Todos",
     "completed": "Concluídos",
     "pending": "Pendentes"
+  },
+  "success": "Sucesso",
+  "error": "Erro",
+  "tasks": "Tarefas",
+  "teams_page": {
+    "title": "Times",
+    "edit_team": "Editar Time",
+    "create_team": "Criar Time",
+    "join_team": "Entrar no Time",
+    "team_name": "Nome do Time",
+    "team_name_hint": "Digite o nome do time",
+    "team_name_validation": "Digite um nome para o time",
+    "create": "Criar",
+    "cancel": "Cancelar",
+    "no_teams_found": "Nenhum time encontrado",
+    "team_code": "Código do Time"
   }
 }

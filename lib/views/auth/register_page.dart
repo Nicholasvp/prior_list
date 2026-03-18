@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -38,7 +39,9 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Criar conta')),
+      appBar: AppBar(
+        title: Text('auth.register'.tr()),
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -53,9 +56,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 const SizedBox(height: 16),
 
-                const Text(
-                  'Criar conta',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                Text(
+                  'auth.register'.tr(),
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
 
                 const SizedBox(height: 32),
@@ -64,9 +70,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextFormField(
                   controller: controller.emailController,
                   validator: controller.validateEmail,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: 'auth.email'.tr(),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
 
@@ -77,9 +83,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: controller.passwordController,
                   validator: controller.validatePassword,
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: 'auth.password'.tr(),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
 
@@ -108,7 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Criar conta'),
+                            : Text('auth.register_button'.tr()),
                       ),
                     );
                   },
@@ -120,10 +126,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Já tem conta?'),
+                    Text('auth.already_have_account'.tr()),
                     TextButton(
                       onPressed: () => context.go('/login'),
-                      child: const Text('Entrar'),
+                      child: Text('auth.login'.tr()),
                     ),
                   ],
                 ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -57,8 +58,8 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: controller.emailController,
                   validator: controller.validateEmail,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
+                  decoration:  InputDecoration(
+                    labelText: 'auth.email'.tr(),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -69,8 +70,8 @@ class _LoginPageState extends State<LoginPage> {
                   controller: controller.passwordController,
                   validator: controller.validatePassword,
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
+                  decoration:  InputDecoration(
+                    labelText: 'auth.password'.tr(),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -90,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                                 width: 20,
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
-                            : const Text('Entrar'),
+                            :  Text('auth.login'.tr()),
                       ),
                     );
                   },
@@ -105,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: loading ? null : controller.loginWithGoogle,
-                        child: const Text('Entrar com Google'),
+                        child:  Text('auth.login_google'.tr()),
                       ),
                     );
                   },
@@ -116,11 +117,11 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Não tem conta?'),
+                     Text('auth.no_account'.tr()),
                     TextButton(
                       onPressed: () =>
                           context.go('/register'),
-                      child: const Text('Criar conta'),
+                      child:  Text('auth.register_button'.tr()),
                     ),
                   ],
                 ),

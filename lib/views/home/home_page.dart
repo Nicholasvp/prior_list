@@ -58,7 +58,7 @@ class HomePage extends StatelessWidget {
               ),
               BottomNavigationBarItem(
                 icon: HugeIcon(icon: HugeIcons.strokeRoundedUserGroup, color: Colors.black),
-                label: 'teams'.tr(),
+                label: 'teams_page.title'.tr(),
               ),
             ],
           ),
