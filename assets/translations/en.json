@@ -71,7 +71,9 @@
     "validation_confirm_password": "Passwords do not match",
     "login_success": "Login successful",
     "register_success": "Account created successfully",
-    "logout_success": "Logged out successfully"
+    "logout_success": "Logged out successfully",
+    "delete_account": "Delete Account",
+    "delete_account_confirm": "Are you sure you want to delete your account? This action cannot be undone."
   },
   "edit_item": "Edit Item",
   "title": "Title",

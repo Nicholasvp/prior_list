@@ -71,7 +71,9 @@
     "validation_confirm_password": "As senhas não coincidem",
     "login_success": "Login realizado com sucesso",
     "register_success": "Conta criada com sucesso",
-    "logout_success": "Logout realizado com sucesso"
+    "logout_success": "Logout realizado com sucesso",
+    "delete_account": "Excluir Conta",
+    "delete_account_confirm": "Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita."
   },
   "edit_item": "Editar Item",
   "title": "Título",

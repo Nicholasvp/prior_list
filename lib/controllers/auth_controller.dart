@@ -17,6 +17,8 @@ class AuthController {
   final errorMessage = ValueNotifier<String?>(null);
   final user = ValueNotifier<User?>(null);
 
+  
+
   bool get isLoggedIn => _authRepository.isLoggedIn;
 
   /// ================= ACTIONS =================
@@ -68,6 +70,20 @@ class AuthController {
 
     try {
       final result = await _authRepository.signInWithGoogle();
+      user.value = result;
+    } catch (e) {
+      errorMessage.value = e.toString();
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> loginWithApple() async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final result = await _authRepository.signInWithApple();
       user.value = result;
     } catch (e) {
       errorMessage.value = e.toString();

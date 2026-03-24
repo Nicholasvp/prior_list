@@ -61,29 +61,67 @@ class AppDrawer extends StatelessWidget {
 
                 const Divider(),
 
-                /// LANGUAGE TITLE
-                ListTile(
+                ExpansionTile(
                   leading: const Icon(Icons.language),
                   title: Text('language.title'.tr()),
+                  children: [
+                    ListTile(
+                      leading: const Text("🇬🇧"),
+                      title: Text('language.english'.tr()),
+                      onTap: () {
+                        context.setLocale(const Locale('en'));
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Text("🇧🇷"),
+                      title: Text('language.portuguese'.tr()),
+                      onTap: () {
+                        context.setLocale(const Locale('pt'));
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
                 ),
 
-                /// ENGLISH
                 ListTile(
-                  leading: const Text("🇬🇧"),
-                  title: Text('language.english'.tr()),
-                  onTap: () {
-                    context.setLocale(const Locale('en'));
-                    Navigator.pop(context);
-                  },
-                ),
+                  leading: const Icon(Icons.delete, color: Colors.red),
+                  title: Text(
+                    'auth.delete_account'.tr(),
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  onTap: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text('auth.delete_account'.tr()),
+                        content: Text('auth.delete_account_confirm'.tr()),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text('cancel'.tr()),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text(
+                              'delete'.tr(),
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
 
-                /// PORTUGUESE
-                ListTile(
-                  leading: const Text("🇧🇷"),
-                  title: Text('language.portuguese'.tr()),
-                  onTap: () {
-                    context.setLocale(const Locale('pt'));
-                    Navigator.pop(context);
+                    if (confirm == true) {
+                      try {
+                        await authRepository.deleteAccount();
+                        Navigator.of(context).pop();
+                      } catch (e) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                      }
+                    }
                   },
                 ),
               ],

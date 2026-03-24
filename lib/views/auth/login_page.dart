@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prior_list/controllers/auth_controller.dart';
 import 'package:prior_list/repositories/auth_repository.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -111,6 +112,20 @@ class _LoginPageState extends State<LoginPage> {
                     );
                   },
                 ),
+                const SizedBox(height: 12),
+
+ValueListenableBuilder(
+  valueListenable: controller.isLoading,
+  builder: (_, loading, __) {
+    return SizedBox(
+      width: double.infinity,
+      child: SignInWithAppleButton(
+        onPressed: loading ? null : controller.loginWithApple,
+        style: SignInWithAppleButtonStyle.black,
+      ),
+    );
+  },
+),
 
                 const SizedBox(height: 24),
 

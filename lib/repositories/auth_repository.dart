@@ -3,6 +3,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:prior_list/main.dart';
 import 'package:prior_list/models/user_model.dart';
 import 'package:prior_list/repositories/database_repository.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthRepository {
   final FirebaseAuth _firebaseAuth;
@@ -70,6 +71,42 @@ class AuthRepository {
     }
   }
 
+  Future<User?> signInWithApple() async {
+  try {
+    final appleCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
+
+    final oauthCredential = OAuthProvider("apple.com").credential(
+      idToken: appleCredential.identityToken,
+      accessToken: appleCredential.authorizationCode,
+    );
+
+    final userCredential =
+        await _firebaseAuth.signInWithCredential(oauthCredential);
+
+    final user = userCredential.user;
+
+    if (user != null) {
+      await databaseRepository.createUser(
+        UserModel(
+          id: user.uid,
+          email: user.email ?? '',
+          name: user.displayName ??
+              "${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}".trim(),
+        ),
+      );
+    }
+
+    return user;
+  } catch (e) {
+    throw Exception('Erro ao fazer login com Apple: $e');
+  }
+}
+
   Future<void> signOut() async {
     try {
       await _firebaseAuth.signOut();
@@ -77,5 +114,17 @@ class AuthRepository {
       throw Exception('Erro ao fazer logout: $e');
     }
   }
+
+  Future<void> deleteAccount() async {
+  try {
+    final user = _firebaseAuth.currentUser;
+
+    if (user != null) {
+      await user.delete();
+    }
+  } catch (e) {
+    throw Exception('Erro ao deletar conta: $e');
+  }
+}
 
 }
