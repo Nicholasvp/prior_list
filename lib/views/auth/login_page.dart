@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:prior_list/controllers/auth_controller.dart';
 import 'package:prior_list/repositories/auth_repository.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:sign_in_button/sign_in_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -59,9 +59,9 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: controller.emailController,
                   validator: controller.validateEmail,
-                  decoration:  InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'auth.email'.tr(),
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
 
@@ -71,14 +71,15 @@ class _LoginPageState extends State<LoginPage> {
                   controller: controller.passwordController,
                   validator: controller.validatePassword,
                   obscureText: true,
-                  decoration:  InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'auth.password'.tr(),
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
 
                 const SizedBox(height: 24),
 
+                // Login com email/senha
                 ValueListenableBuilder(
                   valueListenable: controller.isLoading,
                   builder: (_, loading, __) {
@@ -92,51 +93,86 @@ class _LoginPageState extends State<LoginPage> {
                                 width: 20,
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
-                            :  Text('auth.login'.tr()),
+                            : Text('auth.login'.tr()),
                       ),
                     );
                   },
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
 
+                Row(
+                  children:  [
+                    Expanded(child: Divider()),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text('or'.tr(), style: TextStyle(color: Colors.grey)),
+                    ),
+                    Expanded(child: Divider()),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Google
                 ValueListenableBuilder(
                   valueListenable: controller.isLoading,
                   builder: (_, loading, __) {
-                    return SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: loading ? null : controller.loginWithGoogle,
-                        child:  Text('auth.login_google'.tr()),
+                    return Opacity(
+                      opacity: loading ? 0.5 : 1.0,
+                      child: IgnorePointer(
+                        ignoring: loading,
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: SignInButton(
+                            Buttons.google,
+                            text: 'auth.login_google'.tr(),
+                            onPressed: controller.loginWithGoogle,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
                       ),
                     );
                   },
                 ),
+
                 const SizedBox(height: 12),
 
-ValueListenableBuilder(
-  valueListenable: controller.isLoading,
-  builder: (_, loading, __) {
-    return SizedBox(
-      width: double.infinity,
-      child: SignInWithAppleButton(
-        onPressed: loading ? null : controller.loginWithApple,
-        style: SignInWithAppleButtonStyle.black,
-      ),
-    );
-  },
-),
+                // Apple
+                ValueListenableBuilder(
+                  valueListenable: controller.isLoading,
+                  builder: (_, loading, __) {
+                    return Opacity(
+                      opacity: loading ? 0.5 : 1.0,
+                      child: IgnorePointer(
+                        ignoring: loading,
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: SignInButton(
+                            Buttons.apple,
+                            text: 'auth.login_apple'.tr(),
+                            onPressed: controller.loginWithApple,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
 
                 const SizedBox(height: 24),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                     Text('auth.no_account'.tr()),
+                    Text('auth.no_account'.tr()),
                     TextButton(
-                      onPressed: () =>
-                          context.go('/register'),
-                      child:  Text('auth.register_button'.tr()),
+                      onPressed: () => context.go('/register'),
+                      child: Text('auth.register_button'.tr()),
                     ),
                   ],
                 ),

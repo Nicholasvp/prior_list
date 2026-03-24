@@ -7,6 +7,7 @@
   "no_items_found": "Nenhum item encontrado",
   "no_items_match_search": "Nenhum item corresponde à sua pesquisa",
   "message_reward": "Você ganhou {coins} moedas!",
+  "or": "Ou",
   "priority": {
     "high": "Alta",
     "medium": "Média",
@@ -65,6 +66,7 @@
     "already_have_account": "Já possui uma conta?",
     "login_button": "Entrar",
     "login_google": "Entrar com Google",
+    "login_apple": "Entrar com Apple",
     "register_button": "Criar conta",
     "validation_email": "Digite um email válido",
     "validation_password": "Digite uma senha",

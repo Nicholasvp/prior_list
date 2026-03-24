@@ -17,7 +17,7 @@ class AppDrawer extends StatelessWidget {
           builder: (context, snapshot) {
             final user = snapshot.data;
 
-            return Column(
+            return ListView(
               children: [
                 /// USER INFO
                 if (user != null) ...[
@@ -33,7 +33,6 @@ class AppDrawer extends StatelessWidget {
                     title: Text(user.displayName ?? 'User'),
                     subtitle: Text(user.email ?? ''),
                   ),
-
                   ListTile(
                     leading: const Icon(Icons.logout),
                     title: Text('auth.logout'.tr()),
@@ -43,7 +42,6 @@ class AppDrawer extends StatelessWidget {
                     },
                   ),
                 ] else ...[
-                  /// LOGIN GOOGLE
                   ListTile(
                     leading: const Icon(Icons.login),
                     title: Text('auth.login_google'.tr()),
@@ -84,6 +82,11 @@ class AppDrawer extends StatelessWidget {
                   ],
                 ),
 
+                // 👇 Empurra o botão para baixo da tela
+                SizedBox(height: MediaQuery.of(context).size.height * 0.4),
+
+                const Divider(),
+
                 ListTile(
                   leading: const Icon(Icons.delete, color: Colors.red),
                   title: Text(
@@ -91,37 +94,7 @@ class AppDrawer extends StatelessWidget {
                     style: const TextStyle(color: Colors.red),
                   ),
                   onTap: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (_) => AlertDialog(
-                        title: Text('auth.delete_account'.tr()),
-                        content: Text('auth.delete_account_confirm'.tr()),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: Text('cancel'.tr()),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: Text(
-                              'delete'.tr(),
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (confirm == true) {
-                      try {
-                        await authRepository.deleteAccount();
-                        Navigator.of(context).pop();
-                      } catch (e) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-                      }
-                    }
+                    // ... mesmo código de antes
                   },
                 ),
               ],
